@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">FlashBak</string>
+	<string name="no_backups">没有备份</string>
+	<string name="new_backup">新建</string>
+	<string name="about">关于</string>
+
+</resources>

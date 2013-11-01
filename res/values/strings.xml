@@ -5,5 +5,7 @@
 	<string name="no_backups">No backups yet</string>
 	<string name="new_backup">New</string>
 	<string name="about">About</string>
+	<string name="date">Date: </string>
+	<string name="app_num">Apps: </string>
 
 </resources>

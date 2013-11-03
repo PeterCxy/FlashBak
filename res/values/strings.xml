@@ -7,5 +7,8 @@
 	<string name="about">About</string>
 	<string name="date">Date: </string>
 	<string name="app_num">Apps: </string>
+	<string name="default_backup_name">Backup</string>
+	<string name="confirm_backup">OK</string>
+	<string name="title_new_backup">New Backup</string>
 
 </resources>

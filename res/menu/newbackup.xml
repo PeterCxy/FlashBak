@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <item
+        android:id="@+id/confirm_backup"
+        android:title="@string/confirm_backup"
+		android:showAsAction="always" />
+    
+</menu>

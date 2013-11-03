@@ -24,6 +24,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+		<activity
+			android:label="@string/title_new_backup"
+			android:name=".ui.NewBackupActivity"
+			android:theme="@android:style/Theme.Holo.Light" />
     </application>
 
 </manifest>

@@ -5,10 +5,12 @@ import android.os.*;
 import android.view.*;
 import android.widget.*;
 import android.content.Context;
+import android.content.Intent;
 
 import java.lang.reflect.Field;
 
 import us.shandian.flashbak.helper.BackupLoader;
+import us.shandian.flashbak.ui.NewBackupActivity;
 import us.shandian.flashbak.R;
 
 public class MainBackupListActivity extends Activity
@@ -76,6 +78,21 @@ public class MainBackupListActivity extends Activity
 		MenuInflater inflater = getMenuInflater(); 
 		inflater.inflate(R.menu.backuplist, menu);
 		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		boolean ret = false;
+
+		switch (item.getItemId()) {
+			case R.id.new_backup: {
+				startActivity(new Intent(mContext, NewBackupActivity.class));
+				ret = true;
+				break;
+			}
+		}
+		
+		return ret;
 	}
 	
 	private class MainUiHandler extends Handler {

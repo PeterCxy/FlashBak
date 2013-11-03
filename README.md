@@ -5,7 +5,7 @@ Ui `Dev`
 --Adapters `Dev`  
 --Main Backup List `Half Done`  
 --New Backup Activity `Half Done`  
---Backup/Restore Activity(s) `Dev` 
+--Backup/Restore Activity(s) `Dev`  
 
 Main Function `Dev`  
 --Base Helper Classes `Dev`  

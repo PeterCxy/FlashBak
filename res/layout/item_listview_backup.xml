@@ -1,58 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_height="match_parent"
-	android:layout_width="match_parent"
-	android:orientation="vertical">
+	android:layout_width="match_parent">
 
 	<TextView
-		android:id="@+id/backupitem_name"
-		android:layout_height="wrap_content"
+		android:layout_height="48dp"
+		android:text="1"
+		android:layout_width="48dp"
+		android:background="#96908F"
+		android:gravity="center"
+		android:layout_alignParentLeft="true"
+		android:textColor="#F2F2F2"
+		android:id="@+id/backupitem_num"
+		android:layout_marginBottom="5dp"/>
+
+	<TextView
+		android:layout_height="48dp"
 		android:text="Nameless"
-		android:textAppearance="?android:attr/textAppearanceLarge"
+		android:textAppearance="?android:attr/textAppearanceMedium"
 		android:layout_width="wrap_content"
-		android:paddingLeft="10dp"
-		android:paddingBottom="1dp"
-		android:textSize="20sp"/>
+		android:layout_toRightOf="@id/backupitem_num"
+		android:id="@+id/backupitem_name"
+		android:gravity="center_vertical"
+		android:layout_marginLeft="5dp"
+		android:layout_marginBottom="5dp"/>
 
-	<LinearLayout
-		android:layout_height="wrap_content"
+	<TextView
+		android:layout_height="48dp"
+		android:text="1997-1-1"
 		android:layout_width="wrap_content"
-		android:orientation="horizontal">
+		android:layout_alignParentRight="true"
+		android:gravity="center_vertical"
+		android:id="@+id/backupitem_date"
+		android:textColor="#808080"
+		android:layout_marginBottom="5dp"
+		android:layout_marginRight="5dp"/>
 
-		<TextView
-			android:layout_height="wrap_content"
-			android:text="@string/date"
-			android:textAppearance="?android:attr/textAppearanceSmall"
-			android:layout_width="wrap_content"
-			android:paddingLeft="10dp"
-			android:textSize="12sp"/>
-
-		<TextView
-			android:id="@+id/backupitem_date"
-			android:layout_height="wrap_content"
-			android:text="1997-01-01"
-			android:textAppearance="?android:attr/textAppearanceSmall"
-			android:layout_width="wrap_content"
-			android:paddingRight="6dp"
-			android:textSize="12sp"/>
-
-		<TextView
-			android:layout_height="wrap_content"
-			android:text="@string/app_num"
-			android:textAppearance="?android:attr/textAppearanceSmall"
-			android:layout_width="wrap_content"
-			android:textSize="12sp"/>
-
-		<TextView
-			android:id="@+id/backupitem_num"
-			android:layout_height="wrap_content"
-			android:text="NaN"
-			android:textAppearance="?android:attr/textAppearanceSmall"
-			android:layout_width="wrap_content"
-			android:textSize="12sp"/>
-
-	</LinearLayout>
-
-</LinearLayout>
+</RelativeLayout>
 

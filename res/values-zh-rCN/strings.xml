@@ -4,10 +4,7 @@
     <string name="app_name">FlashBak</string>
 	<string name="no_backups">没有备份</string>
 	<string name="about">关于</string>
-	<string name="date">备份日期: </string>
-	<string name="app_num">备份数量: </string>
 	<string name="default_backup_name">备份</string>
-	<string name="confirm_backup">确认</string>
 	<string name="title_new_backup">新建备份</string>
 
 </resources>

@@ -16,7 +16,7 @@ import us.shandian.flashbak.R;
 public class MainBackupListActivity extends Activity
 {
 
-    private BackupLoader mBackups;
+    private BackupLoader mBackups = new BackupLoader();
 
 	private Context mContext;
 	private MainUiHandler mHandler = new MainUiHandler();
@@ -45,18 +45,7 @@ public class MainBackupListActivity extends Activity
 		mWait.setVisibility(View.VISIBLE);
 		mBackupList.setVisibility(View.GONE);
 		
-		mHandler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				mBackups = new BackupLoader();
-				mBackups.loadBackups();
-				if (mBackups.size() == 0) {
-					mHandler.sendEmptyMessage(MSG_NO_BACKUPS);
-				} else {
-					mHandler.sendEmptyMessage(MSG_SHOW_LIST);
-				}
-			}
-		}, 1000);
+		mHandler.postDelayed(new MainUiRunnable(), 1000);
     }
 
 	/* Credit to: qii */
@@ -95,6 +84,15 @@ public class MainBackupListActivity extends Activity
 		return ret;
 	}
 	
+	@Override
+	public void onResume() {
+		super.onResume();
+		mWait.setVisibility(View.VISIBLE);
+		mNoBackups.setVisibility(View.GONE);
+		mBackupList.setVisibility(View.GONE);
+		mHandler.postDelayed(new MainUiRunnable(), 1000);
+	}
+	
 	private class MainUiHandler extends Handler {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
@@ -113,6 +111,18 @@ public class MainBackupListActivity extends Activity
 										   new int[] {R.id.backupitem_name, R.id.backupitem_date, R.id.backupitem_num}));
 					break;
 				}
+			}
+		}
+	}
+	
+	private class MainUiRunnable implements Runnable {
+		@Override
+		public void run() {
+			mBackups.loadBackups();
+			if (mBackups.size() == 0) {
+				mHandler.sendEmptyMessage(MSG_NO_BACKUPS);
+			} else {
+				mHandler.sendEmptyMessage(MSG_SHOW_LIST);
 			}
 		}
 	}

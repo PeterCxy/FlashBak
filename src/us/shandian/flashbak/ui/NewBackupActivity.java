@@ -5,13 +5,13 @@ import android.os.*;
 import android.widget.*;
 import android.view.*;
 import android.content.Context;
+import android.content.pm.*;
 
 import java.io.File;
+import java.util.*;
 
 import us.shandian.flashbak.R;
 import us.shandian.flashbak.adapter.ApplicationAdapter;
-import java.util.*;
-import android.content.pm.*;
 
 public class NewBackupActivity extends Activity
 {

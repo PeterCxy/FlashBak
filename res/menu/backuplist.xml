@@ -3,7 +3,7 @@
     <item
 		android:id="@+id/new_backup"
 		android:icon="@drawable/ic_action_new"
-		android:showAsAction="ifRoom" />
+		android:showAsAction="always" />
 
 	 <item
 		 android:id="@+id/about"

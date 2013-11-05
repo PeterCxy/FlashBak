@@ -1,6 +1,7 @@
 package us.shandian.flashbak.adapter;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -8,16 +9,15 @@ import android.content.pm.PackageManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.*;
 
 import us.shandian.flashbak.R;
-import android.widget.*;
 
 public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo>
 {
 	private List<ApplicationInfo> mAppsList = null;
+	private List<CheckBox> mCheckBoxes = new ArrayList<CheckBox>();
+	private List<View> mViews = new ArrayList<View>();
 	private Context mContext;
 	private PackageManager mPackageManager;
 	
@@ -27,6 +27,25 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo>
 		this.mContext = context;
 		this.mAppsList = appsList;
 		mPackageManager = mContext.getPackageManager();
+		
+		for (int i = 0; i < mAppsList.size(); i++) {
+			LayoutInflater layoutInflater = (LayoutInflater) mContext
+				                            .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		    View view = layoutInflater.inflate(R.layout.item_listview_newbackup, null);
+			ApplicationInfo data = mAppsList.get(i);
+			if (null != data) {
+				TextView appName = (TextView) view.findViewById(R.id.newbackup_app_name);
+				ImageView iconview = (ImageView) view.findViewById(R.id.newbackup_app_icon);
+				CheckBox checkBox = (CheckBox) view.findViewById(R.id.newbackup_checkbox);
+
+				checkBox.setChecked(true);
+				appName.setText(data.loadLabel(mPackageManager));
+				iconview.setImageDrawable(data.loadIcon(mPackageManager));
+
+				mCheckBoxes.add(checkBox);
+			}
+			mViews.add(view);
+		}
 	}
 	
 	@Override
@@ -47,22 +66,34 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo>
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View view = convertView;
-		if (null == view) {
-			LayoutInflater layoutInflater = (LayoutInflater) mContext
-				                            .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		    view = layoutInflater.inflate(R.layout.item_listview_newbackup, null);
+		if (null != mViews.get(position)) {
+			view = mViews.get(position);
 		}
 		
-		ApplicationInfo data = mAppsList.get(position);
-		if (null != data) {
-		    TextView appName = (TextView) view.findViewById(R.id.newbackup_app_name);
-			ImageView iconview = (ImageView) view.findViewById(R.id.newbackup_app_icon);
-			CheckBox checkBox = (CheckBox) view.findViewById(R.id.newbackup_checkbox);
-			
-		    checkBox.setChecked(true);
-			appName.setText(data.loadLabel(mPackageManager));
-			iconview.setImageDrawable(data.loadIcon(mPackageManager));
-		}
 		return view;
+	}
+	
+	public ArrayList<ApplicationInfo> getCheckedItems() {
+		ArrayList<ApplicationInfo> retApps = new ArrayList<ApplicationInfo>();
+		if (null != mAppsList) {
+			ApplicationInfo info;
+			CheckBox checkBox;
+			for (int i = 0; i < mAppsList.size(); i++) {
+				info = mAppsList.get(i);
+				checkBox = mCheckBoxes.get(i);
+				if (null != checkBox) {
+					if (checkBox.isChecked()) {
+						retApps.add(info);
+					}
+				}
+			}
+		}
+		return retApps;
+	}
+	
+	public void invertSeletion() {
+		for (int i = 0; i < mCheckBoxes.size(); i++) {
+			mCheckBoxes.get(i).setChecked(!mCheckBoxes.get(i).isChecked());
+		}
 	}
 }

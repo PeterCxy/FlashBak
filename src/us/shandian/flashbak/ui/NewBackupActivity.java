@@ -6,12 +6,14 @@ import android.widget.*;
 import android.view.*;
 import android.content.Context;
 import android.content.pm.*;
+import android.util.Base64;
 
 import java.io.File;
 import java.util.*;
 
 import us.shandian.flashbak.R;
 import us.shandian.flashbak.adapter.ApplicationAdapter;
+import us.shandian.flashbak.helper.BackupGenerator;
 
 public class NewBackupActivity extends Activity
 {
@@ -21,6 +23,7 @@ public class NewBackupActivity extends Activity
     private EditText mBackupName;
 	private ListView mAppList;
 	private ProgressBar mWait;
+	private ProgressDialog mProgress;
 	
 	private ApplicationAdapter mAdapter;
 	
@@ -29,6 +32,7 @@ public class NewBackupActivity extends Activity
 	private boolean mAppLoaded = false;
 	
 	private ArrayList<ApplicationInfo> mAppArrayList;
+	private ArrayList<ApplicationInfo> mCheckedAppList;
 	
 	private static final int MSG_APP_LIST_OK = 0;
 
@@ -50,7 +54,7 @@ public class NewBackupActivity extends Activity
 		int i = 1;
 		String defaultName = getResources().getString(R.string.default_backup_name);
 		while (true) {
-			File f = new File(Environment.getExternalStorageDirectory() + "/FlashBak/" + defaultName + i + "/");
+			File f = new File(Environment.getExternalStorageDirectory() + "/FlashBak/" + Base64.encodeToString((defaultName + i).getBytes(), Base64.NO_WRAP) + "/");
 			if (!f.exists()) {
 				defaultName = defaultName + i;
 				break;
@@ -60,13 +64,13 @@ public class NewBackupActivity extends Activity
 		}
 		mBackupName.setText(defaultName);
 		
-		mHandler.postDelayed(new Runnable() {
+		new Thread(new Runnable() {
 			@Override
 			public void run() {
 		        mAppArrayList = checkForLaunchIntent (getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA));
 				mHandler.sendEmptyMessage(MSG_APP_LIST_OK);
 			}
-		}, 1000);
+		}).start();
 		
 
 	}
@@ -105,6 +109,24 @@ public class NewBackupActivity extends Activity
 				ret = true;
 				break;
 			}
+			case R.id.invert_select: {
+				if (mAppLoaded) {
+				    mAdapter.invertSeletion();
+				}
+				break;
+			}
+			case R.id.confirm_backup: {
+				if (mAppLoaded) {
+					mCheckedAppList = mAdapter.getCheckedItems();
+					mProgress = new ProgressDialog(mContext);
+					mProgress.setCancelable(false);
+					mProgress.setTitle(R.string.progress_title);
+					mProgress.setMessage(mContext.getResources().getString(R.string.progress_message));
+					mProgress.show();
+					new Thread(new BackupGenerator(mCheckedAppList, mBackupName.getText().toString(), mHandler)).start();
+				}
+				break;
+			}
 		}
 		
 		return ret;
@@ -121,6 +143,39 @@ public class NewBackupActivity extends Activity
 					mAppList.setAdapter(mAdapter);
 					mAppList.setVisibility(View.VISIBLE);
 					mWait.setVisibility(View.GONE);
+					break;
+				}
+				case BackupGenerator.MSG_PROGRESS_CHANGE: {
+					mProgress.setMessage(mContext.getResources().getString(R.string.progress_message) + "(" + msg.obj.toString() + "/" + mCheckedAppList.size() + ")");
+					break;
+				}
+				case BackupGenerator.MSG_ERROR_SU: {
+					mProgress.dismiss();
+					AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+					dialog.setTitle(R.string.err_title);
+					dialog.setMessage(R.string.err_su);
+					dialog.create().show();
+					break;
+				}
+				case BackupGenerator.MSG_ERROR_DIR: {
+					mProgress.dismiss();
+					AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+						dialog.setTitle(R.string.err_title);
+					dialog.setMessage(R.string.err_dir);
+					dialog.create().show();
+					break;
+				}
+				case BackupGenerator.MSG_ERROR_SHELL: {
+					mProgress.dismiss();
+					AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+						dialog.setTitle(R.string.err_title);
+					dialog.setMessage(R.string.err_shell);
+					dialog.create().show();
+					break;
+				}
+				case BackupGenerator.MSG_GENERATE_SUCCESS: {
+					mProgress.dismiss();
+					finish();
 				}
 			}
 		}

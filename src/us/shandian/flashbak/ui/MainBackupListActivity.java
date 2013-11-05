@@ -45,7 +45,7 @@ public class MainBackupListActivity extends Activity
 		mWait.setVisibility(View.VISIBLE);
 		mBackupList.setVisibility(View.GONE);
 		
-		mHandler.postDelayed(new MainUiRunnable(), 1000);
+		new Thread(new MainUiRunnable()).start();
     }
 
 	/* Credit to: qii */
@@ -90,7 +90,7 @@ public class MainBackupListActivity extends Activity
 		mWait.setVisibility(View.VISIBLE);
 		mNoBackups.setVisibility(View.GONE);
 		mBackupList.setVisibility(View.GONE);
-		mHandler.postDelayed(new MainUiRunnable(), 1000);
+		new Thread(new MainUiRunnable()).start();
 	}
 	
 	private class MainUiHandler extends Handler {
@@ -118,6 +118,7 @@ public class MainBackupListActivity extends Activity
 	private class MainUiRunnable implements Runnable {
 		@Override
 		public void run() {
+			mBackups = new BackupLoader();
 			mBackups.loadBackups();
 			if (mBackups.size() == 0) {
 				mHandler.sendEmptyMessage(MSG_NO_BACKUPS);

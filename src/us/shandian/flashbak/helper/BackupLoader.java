@@ -1,5 +1,7 @@
 package us.shandian.flashbak.helper;
 
+import android.util.Base64;
+
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
@@ -33,7 +35,7 @@ public class BackupLoader
 		for (File file : files) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			if (file.isDirectory()) {
-				map.put("name", file.getName());
+				map.put("name", new String(Base64.decode(file.getName(), Base64.NO_WRAP)));
 				map.put("timestamp", file.lastModified());
 				map.put("date", new SimpleDateFormat("yyyy-MM-dd").format(new Date(file.lastModified())));
 				map.put("num", file.listFiles().length);

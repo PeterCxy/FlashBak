@@ -7,9 +7,9 @@
 	<string name="default_backup_name">备份</string>
 	<string name="title_new_backup">新建备份</string>
 	<string name="progress_title">请稍候</string>
-	<string name="progress_message">正在备份...</string>
+	<string name="progress_message">正在工作...</string>
 	<string name="err_su">没有ROOT权限</string>
-	<string name="err_dir">文件夹已存在</string>
+	<string name="err_dir">文件夹读/写错误</string>
 	<string name="err_shell">命令执行失败</string>
 	<string name="err_title">错误</string>
 

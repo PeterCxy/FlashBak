@@ -7,9 +7,9 @@
 	<string name="default_backup_name">Backup</string>
 	<string name="title_new_backup">New Backup</string>
 	<string name="progress_title">Please Wait</string>
-	<string name="progress_message">Performing backup...</string>
+	<string name="progress_message">Working...</string>
 	<string name="err_su">No ROOT access</string>
-	<string name="err_dir">Directory exists</string>
+	<string name="err_dir">Directory read/write failure</string>
 	<string name="err_shell">Shell command failure</string>
 	<string name="err_title">Error</string>
 

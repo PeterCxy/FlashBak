@@ -18,23 +18,23 @@ import us.shandian.flashbak.helper.BackupGenerator;
 public class NewBackupActivity extends Activity
 {
 
-    private Context mContext;
+    protected Context mContext;
 
-    private EditText mBackupName;
-	private ListView mAppList;
-	private ProgressBar mWait;
-	private ProgressDialog mProgress;
+    protected EditText mBackupName;
+	protected ListView mAppList;
+	protected ProgressBar mWait;
+	protected ProgressDialog mProgress;
 	
-	private ApplicationAdapter mAdapter;
+	protected ApplicationAdapter mAdapter;
 	
-	private NewBackupUiHandler mHandler = new NewBackupUiHandler();
+	protected NewBackupUiHandler mHandler = new NewBackupUiHandler();
 	
-	private boolean mAppLoaded = false;
+	protected boolean mAppLoaded = false;
 	
-	private ArrayList<ApplicationInfo> mAppArrayList;
-	private ArrayList<ApplicationInfo> mCheckedAppList;
+	protected ArrayList<ApplicationInfo> mAppArrayList;
+	protected ArrayList<ApplicationInfo> mCheckedAppList;
 	
-	private static final int MSG_APP_LIST_OK = 0;
+	protected static final int MSG_APP_LIST_OK = 0;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -48,6 +48,11 @@ public class NewBackupActivity extends Activity
 		mAppList = (ListView) findViewById(R.id.newbackup_list);
 		mWait = (ProgressBar) findViewById(R.id.newbackup_wait);
 		
+		initDisplay();
+
+	}
+	
+	private void initDisplay() {
 		mAppList.setVisibility(View.GONE);
 		mWait.setVisibility(View.VISIBLE);
 
@@ -63,16 +68,14 @@ public class NewBackupActivity extends Activity
 			}
 		}
 		mBackupName.setText(defaultName);
-		
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-		        mAppArrayList = checkForLaunchIntent (getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA));
-				mHandler.sendEmptyMessage(MSG_APP_LIST_OK);
-			}
-		}).start();
-		
 
+		new Thread(new Runnable() {
+				@Override
+				public void run() {
+					mAppArrayList = checkForLaunchIntent (getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA));
+					mHandler.sendEmptyMessage(MSG_APP_LIST_OK);
+				}
+			}).start();
 	}
 
 	private ArrayList<ApplicationInfo> checkForLaunchIntent(List<ApplicationInfo> list) {

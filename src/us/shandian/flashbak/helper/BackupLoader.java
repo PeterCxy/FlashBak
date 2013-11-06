@@ -1,6 +1,8 @@
 package us.shandian.flashbak.helper;
 
 import android.util.Base64;
+import android.os.*;
+import android.content.*;
 
 import java.util.Map;
 import java.util.List;
@@ -14,14 +16,15 @@ import java.io.File;
 import java.io.IOException;
 
 import us.shandian.flashbak.helper.BackupItemComparator;
-import android.os.*;
+import android.content.pm.*;
 
 public class BackupLoader
 {
     private List<Map<String, Object>> mBackupList = new ArrayList<Map<String, Object>>();
+	private Context mContext;
 
-    public void BackupLoader() {
-		
+    public BackupLoader(Context context) {
+		mContext = context;
 	}
 	
 	public void loadBackups() {
@@ -60,5 +63,32 @@ public class BackupLoader
 			}
 		}
 		return null;
+	}
+	
+	public ArrayList<ApplicationInfo> getInfo(String name) {
+		ArrayList<ApplicationInfo> applist = new ArrayList<ApplicationInfo>();
+		String backupDir = Environment.getExternalStorageDirectory() + "/FlashBak/" + Base64.encodeToString(get(name).get("name").toString().getBytes(), Base64.NO_WRAP) + "/";
+		File dir = new File(backupDir);
+		if (!dir.exists()) {
+			return applist;
+		}
+		File[] sub = dir.listFiles();
+		for (File f : sub) {
+			if (f.isDirectory()) {
+				String apkPath = f.getPath() + "/package.apk";
+				if (new File(apkPath).exists()) {
+					PackageManager pm = mContext.getPackageManager();
+					ApplicationInfo info = pm.getPackageArchiveInfo(apkPath, PackageManager.GET_ACTIVITIES).applicationInfo;
+					
+					// BEGIN Fix icon error
+					info.sourceDir = apkPath;
+					info.publicSourceDir = apkPath;
+					// END Fix icon error
+					
+					applist.add(info);
+				}
+			}
+		}
+		return applist;
 	}
 }

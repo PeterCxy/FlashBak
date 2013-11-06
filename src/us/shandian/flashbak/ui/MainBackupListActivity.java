@@ -16,7 +16,7 @@ import us.shandian.flashbak.R;
 public class MainBackupListActivity extends Activity
 {
 
-    private BackupLoader mBackups = new BackupLoader();
+    private BackupLoader mBackups;
 
 	private Context mContext;
 	private MainUiHandler mHandler = new MainUiHandler();
@@ -118,7 +118,7 @@ public class MainBackupListActivity extends Activity
 	private class MainUiRunnable implements Runnable {
 		@Override
 		public void run() {
-			mBackups = new BackupLoader();
+			mBackups = new BackupLoader(mContext);
 			mBackups.loadBackups();
 			if (mBackups.size() == 0) {
 				mHandler.sendEmptyMessage(MSG_NO_BACKUPS);

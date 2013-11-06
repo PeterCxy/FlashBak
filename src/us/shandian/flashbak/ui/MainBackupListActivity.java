@@ -8,10 +8,13 @@ import android.content.Context;
 import android.content.Intent;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 
 import us.shandian.flashbak.helper.BackupLoader;
 import us.shandian.flashbak.ui.NewBackupActivity;
+import us.shandian.flashbak.ui.RestoreBackupActivity;
 import us.shandian.flashbak.R;
+import android.widget.AdapterView.*;
 
 public class MainBackupListActivity extends Activity
 {
@@ -24,6 +27,8 @@ public class MainBackupListActivity extends Activity
 	private ListView mBackupList;
 	private ProgressBar mWait;
 	private TextView mNoBackups;
+	
+	private SimpleAdapter mAdapter;
 	
 	private final static int MSG_NO_BACKUPS = 0;
 	private final static int MSG_SHOW_LIST = 1;
@@ -106,9 +111,23 @@ public class MainBackupListActivity extends Activity
 					mNoBackups.setVisibility(View.GONE);
 					mWait.setVisibility(View.GONE);
 					mBackupList.setVisibility(View.VISIBLE);
-					mBackupList.setAdapter(new SimpleAdapter(mContext, mBackups.getAll(), R.layout.item_listview_backup, 
+					mAdapter = new SimpleAdapter(mContext, mBackups.getAll(), R.layout.item_listview_backup, 
 						                   new String[] {"name", "date", "num"}, 
-										   new int[] {R.id.backupitem_name, R.id.backupitem_date, R.id.backupitem_num}));
+										   new int[] {R.id.backupitem_name, R.id.backupitem_date, R.id.backupitem_num});
+					mBackupList.setAdapter(mAdapter);
+					mBackupList.setOnItemClickListener(new OnItemClickListener() {
+						@Override
+						public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+							Map<String, Object> map = (Map<String, Object>) mAdapter.getItem(arg2);
+							String name = (String) map.get("name");
+							Intent intent = new Intent(mContext, RestoreBackupActivity.class);
+							Bundle bundle = new Bundle();
+							bundle.putString("name", name);
+							bundle.putParcelable("loader", mBackups);
+							intent.putExtras(bundle);
+							startActivity(intent);
+						}
+					});
 					break;
 				}
 			}
@@ -118,7 +137,7 @@ public class MainBackupListActivity extends Activity
 	private class MainUiRunnable implements Runnable {
 		@Override
 		public void run() {
-			mBackups = new BackupLoader(mContext);
+			mBackups = new BackupLoader();
 			mBackups.loadBackups();
 			if (mBackups.size() == 0) {
 				mHandler.sendEmptyMessage(MSG_NO_BACKUPS);

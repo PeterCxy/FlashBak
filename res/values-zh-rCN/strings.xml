@@ -12,5 +12,6 @@
 	<string name="err_dir">文件夹读/写错误</string>
 	<string name="err_shell">命令执行失败</string>
 	<string name="err_title">错误</string>
+	<string name="title_restore_backup">恢复备份</string>
 
 </resources>

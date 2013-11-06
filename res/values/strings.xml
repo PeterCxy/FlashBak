@@ -12,5 +12,6 @@
 	<string name="err_dir">Directory read/write failure</string>
 	<string name="err_shell">Shell command failure</string>
 	<string name="err_title">Error</string>
+	<string name="title_restore_backup">Restore Backup</string>
 
 </resources>

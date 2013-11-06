@@ -3,6 +3,8 @@ package us.shandian.flashbak.helper;
 import android.util.Base64;
 import android.os.*;
 import android.content.*;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.util.Map;
 import java.util.List;
@@ -18,13 +20,17 @@ import java.io.IOException;
 import us.shandian.flashbak.helper.BackupItemComparator;
 import android.content.pm.*;
 
-public class BackupLoader
+public class BackupLoader implements Parcelable
 {
-    private List<Map<String, Object>> mBackupList = new ArrayList<Map<String, Object>>();
-	private Context mContext;
+	
+	private List<Map<String, Object>> mBackupList = new ArrayList<Map<String, Object>>();
 
-    public BackupLoader(Context context) {
-		mContext = context;
+    public BackupLoader() {
+		
+	}
+	
+	public BackupLoader(Parcel parcel) {
+		parcel.readList(mBackupList, getClass().getClassLoader());
 	}
 	
 	public void loadBackups() {
@@ -65,7 +71,7 @@ public class BackupLoader
 		return null;
 	}
 	
-	public ArrayList<ApplicationInfo> getInfo(String name) {
+	public ArrayList<ApplicationInfo> getInfo(String name, Context context) {
 		ArrayList<ApplicationInfo> applist = new ArrayList<ApplicationInfo>();
 		String backupDir = Environment.getExternalStorageDirectory() + "/FlashBak/" + Base64.encodeToString(get(name).get("name").toString().getBytes(), Base64.NO_WRAP) + "/";
 		File dir = new File(backupDir);
@@ -77,7 +83,7 @@ public class BackupLoader
 			if (f.isDirectory()) {
 				String apkPath = f.getPath() + "/package.apk";
 				if (new File(apkPath).exists()) {
-					PackageManager pm = mContext.getPackageManager();
+					PackageManager pm = context.getPackageManager();
 					ApplicationInfo info = pm.getPackageArchiveInfo(apkPath, PackageManager.GET_ACTIVITIES).applicationInfo;
 					
 					// BEGIN Fix icon error
@@ -91,4 +97,26 @@ public class BackupLoader
 		}
 		return applist;
 	}
+	
+	@Override
+	public void writeToParcel(Parcel parcel, int flags) {
+		parcel.writeList(mBackupList);
+	}
+	
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+	
+	public static final Parcelable.Creator<BackupLoader> CREATOR = new Parcelable.Creator<BackupLoader>() {
+		@Override
+		public BackupLoader createFromParcel(Parcel parcel) {
+			return new BackupLoader(parcel);
+		}
+		
+		@Override
+		public BackupLoader[] newArray(int size) {
+			return new BackupLoader[size];
+		}
+	};
 }

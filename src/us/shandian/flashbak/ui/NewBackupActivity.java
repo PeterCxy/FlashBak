@@ -52,7 +52,7 @@ public class NewBackupActivity extends Activity
 
 	}
 	
-	private void initDisplay() {
+	protected void initDisplay() {
 		mAppList.setVisibility(View.GONE);
 		mWait.setVisibility(View.VISIBLE);
 

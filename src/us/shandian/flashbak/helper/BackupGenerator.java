@@ -13,7 +13,7 @@ import us.shandian.flashbak.util.CMDProcessor;
 public class BackupGenerator implements Runnable
 {
 
-    private ArrayList<ApplicationInfo> mAppList;
+	private ArrayList<ApplicationInfo> mAppList;
 	private String mBackupName;
 	private Handler mHandler;
 	
@@ -52,7 +52,7 @@ public class BackupGenerator implements Runnable
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 				return;
 			}
-			if (!cmd.su.runWaitFor("busybox tar czvf " + backupDir + info.packageName + "/data.tar.gz /data/data/" + info.packageName).success()) {
+			if (!cmd.su.runWaitFor("busybox tar czvf " + backupDir + info.packageName + "/data.tar.gz /data/data/" + info.packageName + " --exclude lib").success()) {
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 				return;
 			}

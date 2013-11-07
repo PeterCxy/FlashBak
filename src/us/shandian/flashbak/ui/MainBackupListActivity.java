@@ -4,17 +4,18 @@ import android.app.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
+import android.widget.AdapterView.*;
 import android.content.Context;
 import android.content.Intent;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 
+
 import us.shandian.flashbak.helper.BackupLoader;
 import us.shandian.flashbak.ui.NewBackupActivity;
 import us.shandian.flashbak.ui.RestoreBackupActivity;
 import us.shandian.flashbak.R;
-import android.widget.AdapterView.*;
 
 public class MainBackupListActivity extends Activity
 {
@@ -40,6 +41,13 @@ public class MainBackupListActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_backuplist);
 		mContext = (Context) this;
+		String version = "";
+		try {
+			version = getPackageManager().getPackageInfo(this.getApplicationInfo().packageName, 0).versionName;
+		} catch (Exception e) {
+			version = "0.00";
+		}
+		setTitle(getResources().getString(R.string.app_name) + " " + version);
 		
 		mBackupList = (ListView) findViewById(R.id.backup_list);
 		mWait = (ProgressBar) findViewById(R.id.wait_for_list_load);

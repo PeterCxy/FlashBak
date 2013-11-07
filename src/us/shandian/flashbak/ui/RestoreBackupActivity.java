@@ -11,6 +11,7 @@ import java.io.File;
 
 import us.shandian.flashbak.ui.NewBackupActivity;
 import us.shandian.flashbak.helper.BackupLoader;
+import us.shandian.flashbak.helper.BackupRestorer;
 import us.shandian.flashbak.R;
 
 public class RestoreBackupActivity extends NewBackupActivity
@@ -58,17 +59,17 @@ public class RestoreBackupActivity extends NewBackupActivity
 				ret = true;
 				break;
 			}
-			case R.id.confirm_backup: {
-				// TODO: Restore backup functions here
-				ret = true;
-				break;
-			}
 			default: {
 				ret = super.onOptionsItemSelected(item);
 			}
 		}
 		
 		return ret;
+	}
+	
+	@Override
+	protected void startThread() {
+		new Thread(new BackupRestorer(mCheckedAppList, mBackupName.getText().toString(), mHandler)).start();
 	}
 	
 	private void deleteDir(String dirName) {

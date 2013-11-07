@@ -126,13 +126,17 @@ public class NewBackupActivity extends Activity
 					mProgress.setTitle(R.string.progress_title);
 					mProgress.setMessage(mContext.getResources().getString(R.string.progress_message));
 					mProgress.show();
-					new Thread(new BackupGenerator(mCheckedAppList, mBackupName.getText().toString(), mHandler)).start();
+					startThread();
 				}
 				break;
 			}
 		}
 		
 		return ret;
+	}
+	
+	protected void startThread() {
+		new Thread(new BackupGenerator(mCheckedAppList, mBackupName.getText().toString(), mHandler)).start();
 	}
 	
 	private class NewBackupUiHandler extends Handler

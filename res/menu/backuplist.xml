@@ -4,9 +4,5 @@
 		android:id="@+id/new_backup"
 		android:icon="@drawable/ic_action_new"
 		android:showAsAction="always" />
-
-	 <item
-		 android:id="@+id/about"
-		 android:title="@string/about" />
     
 </menu>

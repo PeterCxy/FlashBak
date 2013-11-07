@@ -3,7 +3,6 @@
 
     <string name="app_name">FlashBak</string>
 	<string name="no_backups">No backups yet</string>
-	<string name="about">About</string>
 	<string name="default_backup_name">Backup</string>
 	<string name="title_new_backup">New Backup</string>
 	<string name="progress_title">Please Wait</string>

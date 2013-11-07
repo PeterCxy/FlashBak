@@ -40,7 +40,6 @@ public class MainBackupListActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_backuplist);
 		mContext = (Context) this;
-		forceShowOverflowMenu();
 		
 		mBackupList = (ListView) findViewById(R.id.backup_list);
 		mWait = (ProgressBar) findViewById(R.id.wait_for_list_load);
@@ -52,20 +51,6 @@ public class MainBackupListActivity extends Activity
 		
 		new Thread(new MainUiRunnable()).start();
     }
-
-	/* Credit to: qii */
-	private void forceShowOverflowMenu() {
-		try {
-			ViewConfiguration config = ViewConfiguration.get(this);
-			Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
-			if (menuKeyField != null) {
-				menuKeyField.setAccessible(true);
-				menuKeyField.setBoolean(config, false);
-			}
-		} catch (Exception ignored) {
-			// Do something
-		}
-	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

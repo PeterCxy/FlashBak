@@ -4,6 +4,7 @@ import android.app.*;
 import android.os.*;
 import android.widget.*;
 import android.view.*;
+import android.widget.AdapterView.*;
 import android.content.Context;
 import android.content.pm.*;
 import android.util.Base64;
@@ -148,6 +149,12 @@ public class NewBackupActivity extends Activity
 					mAppLoaded = true;
 					mAdapter = new ApplicationAdapter(mContext, R.layout.item_listview_newbackup, mAppArrayList);
 					mAppList.setAdapter(mAdapter);
+					mAppList.setOnItemClickListener(new OnItemClickListener() {
+						@Override
+						public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+							mAdapter.setChecked(arg2, !mAdapter.isChecked(arg2));
+						}
+					});
 					mAppList.setVisibility(View.VISIBLE);
 					mWait.setVisibility(View.GONE);
 					break;

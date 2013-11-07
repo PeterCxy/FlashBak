@@ -96,4 +96,12 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo>
 			mCheckBoxes.get(i).setChecked(!mCheckBoxes.get(i).isChecked());
 		}
 	}
+	
+	public void setChecked(int position, boolean checked) {
+		mCheckBoxes.get(position).setChecked(checked);
+	}
+	
+	public boolean isChecked(int position) {
+		return mCheckBoxes.get(position).isChecked();
+	}
 }

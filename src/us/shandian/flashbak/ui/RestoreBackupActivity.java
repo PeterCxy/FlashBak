@@ -53,8 +53,7 @@ public class RestoreBackupActivity extends NewBackupActivity
 		
 		switch (item.getItemId()) {
 			case MENU_DELETE_BACKUP: {
-				deleteDir(Environment.getExternalStorageDirectory() + "/FlashBak/" + 
-				         Base64.encodeToString(mName.getBytes(), Base64.NO_WRAP) + "/");
+				mBackups.delete(mName);
 				finish();
 				ret = true;
 				break;
@@ -72,17 +71,5 @@ public class RestoreBackupActivity extends NewBackupActivity
 		new Thread(new BackupRestorer(mCheckedAppList, mBackupName.getText().toString(), mHandler)).start();
 	}
 	
-	private void deleteDir(String dirName) {
-		File dir = new File(dirName);
-		File[] sub = dir.listFiles();
-		for (File f : sub) {
-			if (f.isDirectory()) {
-				deleteDir(f.getPath());
-			} else {
-				f.delete();
-			}
-		}
-		dir.delete();
-	}
-
+	
 }

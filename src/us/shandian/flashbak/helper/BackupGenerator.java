@@ -52,7 +52,7 @@ public class BackupGenerator implements Runnable
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 				return;
 			}
-			if (!cmd.su.runWaitFor("busybox tar czvf " + backupDir + info.packageName + "/data.tar.gz /data/data/" + info.packageName + " --exclude lib").success()) {
+			if (!cmd.su.runWaitFor("busybox tar czvf " + backupDir + info.packageName + "/data.tar.gz /data/data/" + info.packageName + " --exclude lib --exclude cache").success()) {
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 				return;
 			}

@@ -45,7 +45,6 @@ public class BackupGenerator implements Runnable
 		dir.mkdir();
 		ApplicationInfo info;
 		for (int i = 0; i < mAppList.size(); i++) {
-			mHandler.sendMessage(mHandler.obtainMessage(MSG_PROGRESS_CHANGE, i + 1));
 			info = mAppList.get(i);
 			new File(backupDir + info.packageName + "/").mkdir();
 			if (!cmd.su.runWaitFor("busybox cp " + info.sourceDir + " " + backupDir + info.packageName + "/package.apk").success()) {
@@ -56,6 +55,7 @@ public class BackupGenerator implements Runnable
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 				return;
 			}
+			mHandler.sendMessage(mHandler.obtainMessage(MSG_PROGRESS_CHANGE, i + 1));
 		}
 		mHandler.sendEmptyMessage(MSG_GENERATE_SUCCESS);
 	}

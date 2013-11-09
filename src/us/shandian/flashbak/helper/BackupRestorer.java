@@ -43,7 +43,6 @@ public class BackupRestorer implements Runnable
 		}
 		ApplicationInfo info;
 		for (int i = 0; i < mAppList.size(); i++) {
-			mHandler.sendMessage(mHandler.obtainMessage(MSG_PROGRESS_CHANGE, i + 1));
 			info = mAppList.get(i);
 			if (!cmd.su.runWaitFor("pm install -r " + backupDir + info.packageName + "/package.apk").success()) {
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
@@ -85,6 +84,7 @@ public class BackupRestorer implements Runnable
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 				return;
 			}
+			mHandler.sendMessage(mHandler.obtainMessage(MSG_PROGRESS_CHANGE, i + 1));
 		}
 		mHandler.sendEmptyMessage(MSG_RESTORE_SUCCESS);
 	}

@@ -125,6 +125,9 @@ public class NewBackupActivity extends Activity
 					mProgress = new ProgressDialog(mContext);
 					mProgress.setCancelable(false);
 					mProgress.setTitle(R.string.progress_title);
+					mProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+					mProgress.setMax(mCheckedAppList.size());
+					mProgress.setIndeterminate(false);
 					mProgress.setMessage(mContext.getResources().getString(R.string.progress_message));
 					mProgress.show();
 					startThread();
@@ -160,7 +163,7 @@ public class NewBackupActivity extends Activity
 					break;
 				}
 				case BackupGenerator.MSG_PROGRESS_CHANGE: {
-					mProgress.setMessage(mContext.getResources().getString(R.string.progress_message) + "(" + msg.obj.toString() + "/" + mCheckedAppList.size() + ")");
+					mProgress.setProgress(Integer.valueOf(msg.obj.toString()));
 					break;
 				}
 				case BackupGenerator.MSG_ERROR_SU: {

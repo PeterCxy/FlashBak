@@ -31,6 +31,7 @@ public class MainBackupListActivity extends Activity
 	private ProgressBar mWait;
 	private TextView mNoBackups;
 	private SlidingPaneLayout mPane;
+	private LinearLayout mLayout;
 	private Menu mMenu;
 	
 	private SimpleAdapter mAdapter;
@@ -67,12 +68,14 @@ public class MainBackupListActivity extends Activity
 		mBackupList = (ListView) findViewById(R.id.backup_list);
 		mWait = (ProgressBar) findViewById(R.id.wait_for_list_load);
 		mNoBackups = (TextView) findViewById(R.id.no_backups);
+		mLayout = (LinearLayout) findViewById(R.id.main_layout);
 		mPane = (SlidingPaneLayout) findViewById(R.id.mainPane);
 		
 		mPane.setShadowResource(R.drawable.panel_shadow);
 		mPane.setPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
 			@Override
 			public void onPanelOpened(View view) {
+				mLayout.setPadding(0, 0, 0, 0);
 				NewBackupFragment frag = (NewBackupFragment) mFragments.findFragmentById(R.id.container);
 				if (frag != null) {
 					frag.pause();
@@ -83,6 +86,7 @@ public class MainBackupListActivity extends Activity
 			
 			@Override
 			public void onPanelClosed(View view) {
+				mLayout.setPadding(0, 0, 0, 0);
 				NewBackupFragment frag = (NewBackupFragment) mFragments.findFragmentById(R.id.container);
 				if (frag != null) {
 					frag.resume();
@@ -92,7 +96,7 @@ public class MainBackupListActivity extends Activity
 			
 			@Override
 			public void onPanelSlide(View v, float f) {
-				// So what
+				mLayout.setPadding((int) -((1 - f) * 72), 0, (int) ((1 - f) * 72), 0);
 			}
 		});
 		mPane.openPane();

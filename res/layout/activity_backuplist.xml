@@ -6,6 +6,7 @@
 	android:layout_height="match_parent">
 	
 	<LinearLayout
+		android:id="@+id/main_layout"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
 		android:gravity="center"

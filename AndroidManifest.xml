@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="us.shandian.flashbak"
     android:versionCode="1"
-    android:versionName="0.1a" >
+    android:versionName="0.2a" >
 
     <uses-sdk 
         android:minSdkVersion="14" 

@@ -38,13 +38,6 @@ public class MainBackupListActivity extends Activity
 	
 	public String FlashBakTitle = "";
 	
-	
-	/*
-	 * false - NewBackupFragment
-	 * true  - RestoreBackupFragment
-	 */
-	private boolean mState = false;
-	
 	private final static int MSG_NO_BACKUPS = 0;
 	private final static int MSG_SHOW_LIST = 1;
 
@@ -81,7 +74,6 @@ public class MainBackupListActivity extends Activity
 					frag.pause();
 				}
 				mMenu.findItem(R.id.new_backup).setVisible(true);
-				onResume();
 			}
 			
 			@Override
@@ -124,10 +116,7 @@ public class MainBackupListActivity extends Activity
 
 		switch (item.getItemId()) {
 			case R.id.new_backup: {
-				if (mState) {
-					mFragments.beginTransaction().replace(R.id.container, new NewBackupFragment()).commit();
-				}
-				mState = false;
+				mFragments.beginTransaction().replace(R.id.container, new NewBackupFragment()).commit();
 				mPane.closePane();
 				ret = true;
 				break;
@@ -179,7 +168,6 @@ public class MainBackupListActivity extends Activity
 							bundle.putString("name", name);
 							bundle.putParcelable("loader", mBackups);
 							mFragments.beginTransaction().replace(R.id.container, RestoreBackupFragment.newInstance(bundle)).commit();
-							mState = true;
 							mPane.closePane();
 						}
 					});

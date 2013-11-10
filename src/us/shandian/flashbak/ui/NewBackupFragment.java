@@ -33,6 +33,7 @@ public class NewBackupFragment extends Fragment
 	protected NewBackupUiHandler mHandler = new NewBackupUiHandler();
 	
 	protected boolean mAppLoaded = false;
+	protected boolean mNeedReload = false;
 	
 	protected ArrayList<ApplicationInfo> mAppArrayList;
 	protected ArrayList<ApplicationInfo> mCheckedAppList;
@@ -49,6 +50,8 @@ public class NewBackupFragment extends Fragment
 		mContext = (Context) getActivity();
 		
 		setHasOptionsMenu(true);
+		
+		initDisplay();
 
 		return mainLayout;
 	}
@@ -107,7 +110,10 @@ public class NewBackupFragment extends Fragment
 		mMenu.findItem(R.id.invert_select).setVisible(true);
 		mMenu.findItem(R.id.confirm_backup).setVisible(true);
 		getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
-		initDisplay();
+		if (mNeedReload) {
+			initDisplay();
+			mNeedReload = false;
+		}
 	}
 
 	@Override
@@ -153,6 +159,8 @@ public class NewBackupFragment extends Fragment
 	
 	protected void finish() {
 		((MainBackupListActivity) mContext).openPane();
+		((MainBackupListActivity) mContext).onResume();
+		mNeedReload = true; // Reload next time
 	}
 	
 	private class NewBackupUiHandler extends Handler

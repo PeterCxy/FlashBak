@@ -174,9 +174,7 @@ public class MainBackupListActivity extends Activity
 							Bundle bundle = new Bundle();
 							bundle.putString("name", name);
 							bundle.putParcelable("loader", mBackups);
-							if (!mState) {
-								mFragments.beginTransaction().replace(R.id.container, RestoreBackupFragment.newInstance(bundle)).commit();
-							}
+							mFragments.beginTransaction().replace(R.id.container, RestoreBackupFragment.newInstance(bundle)).commit();
 							mState = true;
 							mPane.closePane();
 						}

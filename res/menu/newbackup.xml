@@ -3,11 +3,13 @@
     <item
         android:id="@+id/invert_select"
 		android:icon="@drawable/ic_action_select_all"
-		android:showAsAction="always" />
+		android:showAsAction="always"
+		android:visible="false"/>
 	
 	<item
         android:id="@+id/confirm_backup"
 		android:icon="@drawable/ic_action_accept"
-		android:showAsAction="always" />
+		android:showAsAction="always"
+		android:visible="false"/>
     
 </menu>

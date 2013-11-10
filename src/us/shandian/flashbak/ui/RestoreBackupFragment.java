@@ -9,12 +9,12 @@ import android.view.*;
 
 import java.io.File;
 
-import us.shandian.flashbak.ui.NewBackupActivity;
+import us.shandian.flashbak.ui.NewBackupFragment;
 import us.shandian.flashbak.helper.BackupLoader;
 import us.shandian.flashbak.helper.BackupRestorer;
 import us.shandian.flashbak.R;
 
-public class RestoreBackupActivity extends NewBackupActivity
+public class RestoreBackupFragment extends NewBackupFragment
 {
 
     private static final int MENU_DELETE_BACKUP = R.id.confirm_backup + 1;
@@ -24,7 +24,7 @@ public class RestoreBackupActivity extends NewBackupActivity
 	
 	@Override
 	protected void initDisplay() {
-		Bundle extras = getIntent().getExtras();
+		Bundle extras = getArguments();
 		mBackups = extras.getParcelable("loader");
 		mName = extras.getString("name");
 		
@@ -41,10 +41,22 @@ public class RestoreBackupActivity extends NewBackupActivity
 	}
 	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		menu.add(0, MENU_DELETE_BACKUP, 0, "").setIcon(R.drawable.ic_action_discard).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		return true;
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		mMenu.add(0, MENU_DELETE_BACKUP, 0, "").setIcon(R.drawable.ic_action_discard).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS).setVisible(false);
+	}
+	
+	@Override
+	public void pause() {
+		super.pause();
+		mMenu.findItem(MENU_DELETE_BACKUP).setVisible(false);
+	}
+	
+	@Override
+	public void resume() {
+		super.resume();
+		mMenu.findItem(MENU_DELETE_BACKUP).setVisible(true);
+		((Activity) mContext).setTitle(R.string.title_restore_backup);
 	}
 	
 	@Override
@@ -69,6 +81,12 @@ public class RestoreBackupActivity extends NewBackupActivity
 	@Override
 	protected void startThread() {
 		new Thread(new BackupRestorer(mCheckedAppList, mBackupName.getText().toString(), mHandler)).start();
+	}
+	
+	public static RestoreBackupFragment newInstance(Bundle bundle) {
+		RestoreBackupFragment ret = new RestoreBackupFragment();
+		ret.setArguments(bundle);
+		return ret;
 	}
 	
 	

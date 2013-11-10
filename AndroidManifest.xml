@@ -24,14 +24,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-		<activity
-			android:label="@string/title_new_backup"
-			android:name=".ui.NewBackupActivity"
-			android:theme="@android:style/Theme.Holo.Light.DarkActionBar" />
-		<activity
-			android:label="@string/title_restore_backup"
-			android:name=".ui.RestoreBackupActivity"
-			android:theme="@android:style/Theme.Holo.Light.DarkActionBar" />
     </application>
 
 </manifest>

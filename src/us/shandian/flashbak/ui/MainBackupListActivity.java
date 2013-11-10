@@ -7,14 +7,15 @@ import android.widget.*;
 import android.widget.AdapterView.*;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.widget.SlidingPaneLayout;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 
 
 import us.shandian.flashbak.helper.BackupLoader;
-import us.shandian.flashbak.ui.NewBackupActivity;
-import us.shandian.flashbak.ui.RestoreBackupActivity;
+import us.shandian.flashbak.ui.NewBackupFragment;
+import us.shandian.flashbak.ui.RestoreBackupFragment;
 import us.shandian.flashbak.R;
 
 public class MainBackupListActivity extends Activity
@@ -23,13 +24,25 @@ public class MainBackupListActivity extends Activity
     private BackupLoader mBackups;
 
 	private Context mContext;
+	private FragmentManager mFragments;
 	private MainUiHandler mHandler = new MainUiHandler();
 
 	private ListView mBackupList;
 	private ProgressBar mWait;
 	private TextView mNoBackups;
+	private SlidingPaneLayout mPane;
+	private Menu mMenu;
 	
 	private SimpleAdapter mAdapter;
+	
+	public String FlashBakTitle = "";
+	
+	
+	/*
+	 * false - NewBackupFragment
+	 * true  - RestoreBackupFragment
+	 */
+	private boolean mState = false;
 	
 	private final static int MSG_NO_BACKUPS = 0;
 	private final static int MSG_SHOW_LIST = 1;
@@ -47,15 +60,48 @@ public class MainBackupListActivity extends Activity
 		} catch (Exception e) {
 			version = "0.00";
 		}
-		setTitle(getResources().getString(R.string.app_name) + " " + version);
-		
+		FlashBakTitle = getResources().getString(R.string.app_name) + " " + version;
+		setTitle(FlashBakTitle);
+
+		mFragments = getFragmentManager();
 		mBackupList = (ListView) findViewById(R.id.backup_list);
 		mWait = (ProgressBar) findViewById(R.id.wait_for_list_load);
 		mNoBackups = (TextView) findViewById(R.id.no_backups);
+		mPane = (SlidingPaneLayout) findViewById(R.id.mainPane);
+		
+		mPane.setShadowResource(R.drawable.panel_shadow);
+		mPane.setPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
+			@Override
+			public void onPanelOpened(View view) {
+				NewBackupFragment frag = (NewBackupFragment) mFragments.findFragmentById(R.id.container);
+				if (frag != null) {
+					frag.pause();
+				}
+				mMenu.findItem(R.id.new_backup).setVisible(true);
+				onResume();
+			}
+			
+			@Override
+			public void onPanelClosed(View view) {
+				NewBackupFragment frag = (NewBackupFragment) mFragments.findFragmentById(R.id.container);
+				if (frag != null) {
+					frag.resume();
+				}
+				mMenu.findItem(R.id.new_backup).setVisible(false);
+			}
+			
+			@Override
+			public void onPanelSlide(View v, float f) {
+				// So what
+			}
+		});
+		mPane.openPane();
 		
 		mNoBackups.setVisibility(View.GONE);
 		mWait.setVisibility(View.VISIBLE);
 		mBackupList.setVisibility(View.GONE);
+		
+		mFragments.beginTransaction().replace(R.id.container, new NewBackupFragment()).commit();
 		
 		new Thread(new MainUiRunnable()).start();
     }
@@ -64,6 +110,7 @@ public class MainBackupListActivity extends Activity
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater(); 
 		inflater.inflate(R.menu.backuplist, menu);
+		mMenu = menu;
 		return true;
 	}
 	
@@ -73,9 +120,16 @@ public class MainBackupListActivity extends Activity
 
 		switch (item.getItemId()) {
 			case R.id.new_backup: {
-				startActivity(new Intent(mContext, NewBackupActivity.class));
+				if (mState) {
+					mFragments.beginTransaction().replace(R.id.container, new NewBackupFragment()).commit();
+				}
+				mState = false;
+				mPane.closePane();
 				ret = true;
 				break;
+			}
+			case android.R.id.home: {
+				mPane.openPane();
 			}
 		}
 		
@@ -89,6 +143,10 @@ public class MainBackupListActivity extends Activity
 		mNoBackups.setVisibility(View.GONE);
 		mBackupList.setVisibility(View.GONE);
 		new Thread(new MainUiRunnable()).start();
+	}
+	
+	public void openPane() {
+		mPane.openPane();
 	}
 	
 	private class MainUiHandler extends Handler {
@@ -113,12 +171,14 @@ public class MainBackupListActivity extends Activity
 						public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 							Map<String, Object> map = (Map<String, Object>) mAdapter.getItem(arg2);
 							String name = (String) map.get("name");
-							Intent intent = new Intent(mContext, RestoreBackupActivity.class);
 							Bundle bundle = new Bundle();
 							bundle.putString("name", name);
 							bundle.putParcelable("loader", mBackups);
-							intent.putExtras(bundle);
-							startActivity(intent);
+							if (!mState) {
+								mFragments.beginTransaction().replace(R.id.container, RestoreBackupFragment.newInstance(bundle)).commit();
+							}
+							mState = true;
+							mPane.closePane();
 						}
 					});
 					break;

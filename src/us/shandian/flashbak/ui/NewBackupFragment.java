@@ -15,8 +15,9 @@ import java.util.*;
 import us.shandian.flashbak.R;
 import us.shandian.flashbak.adapter.ApplicationAdapter;
 import us.shandian.flashbak.helper.BackupGenerator;
+import us.shandian.flashbak.ui.MainBackupListActivity;
 
-public class NewBackupActivity extends Activity
+public class NewBackupFragment extends Fragment
 {
 
     protected Context mContext;
@@ -25,6 +26,7 @@ public class NewBackupActivity extends Activity
 	protected ListView mAppList;
 	protected ProgressBar mWait;
 	protected ProgressDialog mProgress;
+	protected Menu mMenu;
 	
 	protected ApplicationAdapter mAdapter;
 	
@@ -36,21 +38,19 @@ public class NewBackupActivity extends Activity
 	protected ArrayList<ApplicationInfo> mCheckedAppList;
 	
 	protected static final int MSG_APP_LIST_OK = 0;
-
+	
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_newbackup);
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+	public View onCreateView(LayoutInflater inflater, ViewGroup group, Bundle savedInstanceState) {
+		View mainLayout = inflater.inflate(R.layout.fragment_newbackup, group, false);
+		mBackupName = (EditText) mainLayout.findViewById(R.id.newbackup_name);
+		mAppList = (ListView) mainLayout.findViewById(R.id.newbackup_list);
+		mWait = (ProgressBar) mainLayout.findViewById(R.id.newbackup_wait);
 
-		mContext = (Context) this;
-
-		mBackupName = (EditText) findViewById(R.id.newbackup_name);
-		mAppList = (ListView) findViewById(R.id.newbackup_list);
-		mWait = (ProgressBar) findViewById(R.id.newbackup_wait);
+		mContext = (Context) getActivity();
 		
-		initDisplay();
+		setHasOptionsMenu(true);
 
+		return mainLayout;
 	}
 	
 	protected void initDisplay() {
@@ -73,7 +73,7 @@ public class NewBackupActivity extends Activity
 		new Thread(new Runnable() {
 				@Override
 				public void run() {
-					mAppArrayList = checkForLaunchIntent (getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA));
+					mAppArrayList = checkForLaunchIntent(mContext.getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA));
 					mHandler.sendEmptyMessage(MSG_APP_LIST_OK);
 				}
 			}).start();
@@ -83,8 +83,8 @@ public class NewBackupActivity extends Activity
 		ArrayList<ApplicationInfo> applist = new ArrayList<ApplicationInfo>();
 		for (ApplicationInfo info : list) {
 			try {
-				if (null != getPackageManager().getLaunchIntentForPackage(info.packageName) 
-					&& !info.packageName.equals(this.getApplicationInfo().packageName) 
+				if (null != mContext.getPackageManager().getLaunchIntentForPackage(info.packageName) 
+					&& !info.packageName.equals(mContext.getApplicationInfo().packageName) 
 					&& (info.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
 					applist.add(info);
 				}
@@ -95,12 +95,25 @@ public class NewBackupActivity extends Activity
 		return applist;
 	}
 	
+	public void pause() {
+		((Activity) mContext).setTitle(((MainBackupListActivity) mContext).FlashBakTitle);
+		mMenu.findItem(R.id.invert_select).setVisible(false);
+		mMenu.findItem(R.id.confirm_backup).setVisible(false);
+		getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
+	}
+	
+	public void resume() {
+		((Activity) mContext).setTitle(R.string.title_new_backup);
+		mMenu.findItem(R.id.invert_select).setVisible(true);
+		mMenu.findItem(R.id.confirm_backup).setVisible(true);
+		getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+		initDisplay();
+	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-	    MenuInflater inflater = getMenuInflater();
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.newbackup, menu);
-		return true;
+		mMenu = menu;
 	}
 	
 	@Override
@@ -108,11 +121,6 @@ public class NewBackupActivity extends Activity
 		boolean ret = false;
 		
 		switch (item.getItemId()) {
-			case android.R.id.home: {
-				finish();
-				ret = true;
-				break;
-			}
 			case R.id.invert_select: {
 				if (mAppLoaded) {
 				    mAdapter.invertSeletion();
@@ -141,6 +149,10 @@ public class NewBackupActivity extends Activity
 	
 	protected void startThread() {
 		new Thread(new BackupGenerator(mCheckedAppList, mBackupName.getText().toString(), mHandler)).start();
+	}
+	
+	protected void finish() {
+		((MainBackupListActivity) mContext).openPane();
 	}
 	
 	private class NewBackupUiHandler extends Handler

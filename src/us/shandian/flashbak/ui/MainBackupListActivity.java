@@ -138,6 +138,15 @@ public class MainBackupListActivity extends Activity
 		new Thread(new MainUiRunnable()).start();
 	}
 	
+	@Override
+	public void onBackPressed() {
+		if (mPane.isOpen()) {
+			finish();
+		} else {
+			mPane.openPane();
+		}
+	}
+	
 	public void openPane() {
 		mPane.openPane();
 	}

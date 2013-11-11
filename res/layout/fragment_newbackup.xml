@@ -5,33 +5,42 @@
 	android:layout_height="fill_parent"
 	android:orientation="vertical"
 	android:focusable="true"
-	android:focusableInTouchMode="true">
+	android:focusableInTouchMode="true"
+	android:background="#E0E0DF">
 
 	<EditText
-		android:layout_height="wrap_content"
+		android:layout_height="match_parent"
 		android:ems="10"
 		android:layout_width="match_parent"
-		android:layout_weight="0.1"
+		android:layout_weight="1.1"
 		android:id="@+id/newbackup_name"
-		android:singleLine="true"/>
+		android:singleLine="true"
+		android:background="#FBFBFB"
+		android:layout_marginBottom="2dp"
+		android:layout_marginTop="2dp"
+		android:paddingLeft="8dp"
+		android:textSize="14sp"/>
 
 	<LinearLayout
 		android:layout_height="match_parent"
 		android:layout_width="match_parent"
 		android:orientation="horizontal"
-		android:layout_weight="0.9"
-		android:gravity="center">
+		android:layout_weight="0.1"
+		android:gravity="center"
+		android:background="#F3F3F3">
 
 		<ListView
 			android:layout_height="match_parent"
 			android:layout_width="wrap_content"
 			android:id="@+id/newbackup_list"
-			android:visibility="gone"/>
+			android:visibility="gone"
+			android:background="#F3F3F3"/>
 
 		<ProgressBar
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
-			android:id="@+id/newbackup_wait"/>
+			android:id="@+id/newbackup_wait"
+			android:background="#F3F3F3"/>
 
 	</LinearLayout>
 

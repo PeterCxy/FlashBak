@@ -84,6 +84,30 @@ public class BackupRestorer implements Runnable
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 				return;
 			}
+			
+			// Check for odex file
+			if (new File(backupDir + info.packageName + "/package.odex").exists()) {
+				String name = "/data/app/" + info.packageName + "-";
+				for (int j = 1; j <= 2; j++) {
+					if (new File(name + j + ".apk").exists()) {
+						name = name + j + ".odex";
+						break;
+					}
+				}
+				
+				if (!cmd.su.runWaitFor("busybox cp " + backupDir + info.packageName + "/package.odex " + name).success()) {
+					mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
+					return;
+				}
+				if (!cmd.su.runWaitFor("busybox chown system:" + appUid + " " + name).success()) {
+					mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
+					return;
+				}
+				if (!cmd.su.runWaitFor("busybox chmod 0644 " + name).success()) {
+					mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
+					return;
+				}
+			}
 			mHandler.sendMessage(mHandler.obtainMessage(MSG_PROGRESS_CHANGE, i + 1));
 		}
 		mHandler.sendEmptyMessage(MSG_RESTORE_SUCCESS);

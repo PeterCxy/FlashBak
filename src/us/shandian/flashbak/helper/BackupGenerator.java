@@ -51,6 +51,8 @@ public class BackupGenerator implements Runnable
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 				return;
 			}
+			// Don't need to check for success because not all apps have odex file
+			cmd.su.runWaitFor("busybox cp " + info.sourceDir.substring(0, info.sourceDir.length() - 3) + "odex" + " " + backupDir + info.packageName + "/package.odex");
 			if (!cmd.su.runWaitFor("busybox tar czvf " + backupDir + info.packageName + "/data.tar.gz /data/data/" + info.packageName + " --exclude lib --exclude cache").success()) {
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 				return;

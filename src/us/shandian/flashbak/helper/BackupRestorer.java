@@ -88,6 +88,8 @@ public class BackupRestorer implements Runnable
 			// Check for odex file
 			if (new File(backupDir + info.packageName + "/package.odex").exists()) {
 				String name = "/data/app/" + info.packageName + "-";
+				cmd.su.runWaitFor("busybox rm " + name + "1" + ".odex"); // Delete possibly existing odex
+				cmd.su.runWaitFor("busybox rm " + name + "2" + ".odex");
 				for (int j = 1; j <= 2; j++) {
 					if (new File(name + j + ".apk").exists()) {
 						name = name + j + ".odex";

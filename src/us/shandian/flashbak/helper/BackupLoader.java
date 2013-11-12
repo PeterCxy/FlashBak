@@ -73,7 +73,7 @@ public class BackupLoader implements Parcelable
 	
 	public ArrayList<ApplicationInfo> getInfo(String name, Context context) {
 		ArrayList<ApplicationInfo> applist = new ArrayList<ApplicationInfo>();
-		String backupDir = Environment.getExternalStorageDirectory() + "/FlashBak/" + Base64.encodeToString(get(name).get("name").toString().getBytes(), Base64.NO_WRAP) + "/";
+		String backupDir = Environment.getExternalStorageDirectory() + "/FlashBak/" + Base64.encodeToString(name.getBytes(), Base64.NO_WRAP) + "/";
 		File dir = new File(backupDir);
 		if (!dir.exists()) {
 			return applist;

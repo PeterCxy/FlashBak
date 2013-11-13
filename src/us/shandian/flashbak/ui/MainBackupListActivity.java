@@ -26,6 +26,9 @@ public class MainBackupListActivity extends Activity
 	private Context mContext;
 	private FragmentManager mFragments;
 	private MainUiHandler mHandler = new MainUiHandler();
+	private Thread mThread = new Thread(new MainUiRunnable());
+	
+	private boolean mThreadRunning = false;
 
 	private ListView mBackupList;
 	private ProgressBar mWait;
@@ -99,7 +102,8 @@ public class MainBackupListActivity extends Activity
 		
 		mFragments.beginTransaction().replace(R.id.container, new NewBackupFragment()).commit();
 		
-		new Thread(new MainUiRunnable()).start();
+		mThreadRunning = true;
+		mThread.start();
     }
 	
 	@Override
@@ -135,7 +139,10 @@ public class MainBackupListActivity extends Activity
 		mWait.setVisibility(View.VISIBLE);
 		mNoBackups.setVisibility(View.GONE);
 		mBackupList.setVisibility(View.GONE);
-		new Thread(new MainUiRunnable()).start();
+		if (!mThreadRunning) {
+			mThread = new Thread(new MainUiRunnable());
+			mThread.start();
+		}
 	}
 	
 	@Override
@@ -153,6 +160,7 @@ public class MainBackupListActivity extends Activity
 	
 	private class MainUiHandler extends Handler {
 		public void handleMessage(Message msg) {
+			mThreadRunning = false;
 			switch (msg.what) {
 				case MSG_NO_BACKUPS: {
 					mNoBackups.setVisibility(View.VISIBLE);

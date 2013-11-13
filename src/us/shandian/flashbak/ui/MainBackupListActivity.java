@@ -140,6 +140,7 @@ public class MainBackupListActivity extends Activity
 		mNoBackups.setVisibility(View.GONE);
 		mBackupList.setVisibility(View.GONE);
 		if (!mThreadRunning) {
+			mThreadRunning = true;
 			mThread = new Thread(new MainUiRunnable());
 			mThread.start();
 		}

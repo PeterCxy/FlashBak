@@ -2,7 +2,6 @@ package us.shandian.flashbak.helper;
 
 import android.content.pm.ApplicationInfo;
 import android.os.*;
-import android.util.Log;
 import android.util.Base64;
 
 import java.util.ArrayList;
@@ -51,13 +50,10 @@ public class BackupRestorer implements Runnable
 			String appUid = "";
 			String appLib = "";
 			String[] ls = cmd.su.runWaitFor("busybox ls -l /data/data").stdout.split(" ");
-			Log.d("FlashBak", cmd.su.runWaitFor("busybox ls -l /data/data").stdout);
 			for (String str : ls) {
 				if (str.startsWith("app_")) {
-					Log.d("FlashBak", str);
 					appUid = str;
 				} else if (str.startsWith(info.packageName.substring(0, info.packageName.length() - 1))) {
-					Log.d("FlashBak", "found");
 					break;
 				}
 			}

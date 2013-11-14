@@ -76,14 +76,17 @@ public class NewBackupFragment extends Fragment
 		new Thread(new Runnable() {
 				@Override
 				public void run() {
-					mAppArrayList = checkForLaunchIntent(mContext.getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA));
+					mAppArrayList = getBackupableList(mContext.getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA));
 					mHandler.sendEmptyMessage(MSG_APP_LIST_OK);
 				}
 			}).start();
 	}
 
-	private ArrayList<ApplicationInfo> checkForLaunchIntent(List<ApplicationInfo> list) {
+	private ArrayList<ApplicationInfo> getBackupableList(List<ApplicationInfo> list) {
 		ArrayList<ApplicationInfo> applist = new ArrayList<ApplicationInfo>();
+		ApplicationInfo contactInfo = new ApplicationInfo();
+		contactInfo.packageName = "Contacts";
+		applist.add(contactInfo);
 		for (ApplicationInfo info : list) {
 			try {
 				if (null != mContext.getPackageManager().getLaunchIntentForPackage(info.packageName) 
@@ -154,7 +157,7 @@ public class NewBackupFragment extends Fragment
 	}
 	
 	protected void startThread() {
-		new Thread(new BackupGenerator(mCheckedAppList, mBackupName.getText().toString(), mHandler)).start();
+		new Thread(new BackupGenerator(mCheckedAppList, mBackupName.getText().toString(), mHandler, mContext)).start();
 	}
 	
 	protected void finish() {

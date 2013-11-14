@@ -39,8 +39,12 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo>
 				CheckBox checkBox = (CheckBox) view.findViewById(R.id.newbackup_checkbox);
 
 				checkBox.setChecked(true);
-				appName.setText(data.loadLabel(mPackageManager));
-				iconview.setImageDrawable(data.loadIcon(mPackageManager));
+				if (!data.packageName.equals("Contacts")) {
+					appName.setText(data.loadLabel(mPackageManager));
+					iconview.setImageDrawable(data.loadIcon(mPackageManager));
+				} else {
+					appName.setText(R.string.item_backup_contacts);
+				}
 
 				mCheckBoxes.add(checkBox);
 			}

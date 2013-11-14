@@ -5,6 +5,7 @@ import android.os.*;
 import android.content.*;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.content.pm.*;
 
 import java.util.Map;
 import java.util.List;
@@ -18,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 
 import us.shandian.flashbak.helper.BackupItemComparator;
-import android.content.pm.*;
 
 public class BackupLoader implements Parcelable
 {
@@ -92,6 +92,12 @@ public class BackupLoader implements Parcelable
 					// END Fix icon error
 					
 					applist.add(info);
+				} else {
+					ApplicationInfo info = new ApplicationInfo();
+					if (f.getName().equals("Contacts")) {
+						info.packageName = "Contacts";
+						applist.add(info);
+					}
 				}
 			}
 		}

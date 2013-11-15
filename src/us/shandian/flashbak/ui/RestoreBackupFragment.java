@@ -80,7 +80,7 @@ public class RestoreBackupFragment extends NewBackupFragment
 	
 	@Override
 	protected void startThread() {
-		new Thread(new BackupRestorer(mCheckedAppList, mBackupName.getText().toString(), mHandler)).start();
+		new Thread(new BackupRestorer(mCheckedAppList, mBackupName.getText().toString(), mHandler, mContext)).start();
 	}
 	
 	public static RestoreBackupFragment newInstance(Bundle bundle) {

@@ -59,7 +59,9 @@ public class BackupGenerator implements Runnable
 		for (int i = 0; i < mAppList.size(); i++) {
 			info = mAppList.get(i);
 			if (info.packageName.equals("Contacts")) {
-				backupContacts(backupDir);
+				if (!backupContacts(backupDir)) {
+					return;
+				}
 				continue;
 			}
 			new File(backupDir + info.packageName + "/").mkdir();
@@ -78,7 +80,7 @@ public class BackupGenerator implements Runnable
 		mHandler.sendEmptyMessage(MSG_GENERATE_SUCCESS);
 	}
 	
-	private void backupContacts(String dir) {
+	private boolean backupContacts(String dir) {
 		// Credit: ShenduOS Team
 		Cursor c = mContext.getContentResolver().query(Data.CONTENT_URI, null, null, null, "raw_contact_id");
 		ArrayList<ContactInfo> contacts = new ArrayList<ContactInfo>();
@@ -86,19 +88,18 @@ public class BackupGenerator implements Runnable
 		String number = "";
 		String email = "";
 		int oldId = -1;
+		ContactInfo info = null;
 		while (c.moveToNext()) {
 			int newId = c.getInt(c.getColumnIndex(Data.RAW_CONTACT_ID));
 			if (newId != oldId) {
 				// Raw id changed: this is a new contact
-				if (oldId != -1) {
-					ContactInfo info = new ContactInfo();
-					info.setRawId(oldId);
-					info.setName(name);
-					info.setNumber(number);
-					info.setEmail(email);
-					contacts.add(info);
-				}
 				oldId = newId;
+				info = new ContactInfo();
+				info.setRawId(oldId);
+				contacts.add(info);
+				name = "";
+				number = "";
+				email = "";
 			}
 			
 			String mime = c.getString(c.getColumnIndex(Data.MIMETYPE));
@@ -106,34 +107,38 @@ public class BackupGenerator implements Runnable
 				String phoneType = c.getString(c.getColumnIndex(Phone.TYPE));
 				String phoneNumber = c.getString(c.getColumnIndex(Phone.NUMBER));
 				number = number + phoneType + ":" + phoneNumber + ";";
+				info.setNumber(number);
 			} else if (StructuredName.CONTENT_ITEM_TYPE.equals(mime)) {
 				name = c.getString(c.getColumnIndex(StructuredName.DISPLAY_NAME));
+				info.setName(name);
 			} else if (Email.CONTENT_ITEM_TYPE.equals(mime)) {
 				String emailType = c.getString(c.getColumnIndex(Email.TYPE));
 				String emailAddress = c.getString(c.getColumnIndex(Email.ADDRESS));
 				email = email + emailType + ":" + emailAddress + ";";
+				info.setEmail(email);
 			}
 		}
 		
-		writeContacts(dir, contacts);
+		c.close();
+		
+		return writeContacts(dir, contacts);
 	}
 	
-	private void writeContacts(String dir, ArrayList<ContactInfo> list) {
+	private boolean writeContacts(String dir, ArrayList<ContactInfo> list) {
 		File f = new File(dir + "Contacts/");
 		if (f.exists()) {
 			mHandler.sendEmptyMessage(MSG_ERROR_DIR);
-			return;
+			return false;
 		} else {
 			f.mkdir();
 		}
 		
-		for (int i = 0; i < list.size(); i++) {
-			ContactInfo info = list.get(i);
-			String subPath = dir + "Contacts/" + i + "/";
+		for (ContactInfo info : list) {
+			String subPath = dir + "Contacts/" + Base64.encodeToString(info.getName().getBytes(), Base64.NO_WRAP) + "/";
 			File sub = new File(subPath);
 			if (sub.exists()) {
 				mHandler.sendEmptyMessage(MSG_ERROR_DIR);
-				return;
+				return false;
 			} else {
 				sub.mkdir();
 			}
@@ -147,13 +152,13 @@ public class BackupGenerator implements Runnable
 			File data = new File(subPath + "data");
 			if (data.exists()) {
 				mHandler.sendEmptyMessage(MSG_ERROR_DIR);
-				return;
+				return false;
 			} else {
 				try {
 					data.createNewFile();
 				} catch (IOException e1) {
 					mHandler.sendEmptyMessage(MSG_ERROR_DIR);
-					return;
+					return false;
 				}
 			}
 			FileOutputStream opt;
@@ -161,7 +166,7 @@ public class BackupGenerator implements Runnable
 				opt = new FileOutputStream(data);
 			} catch (FileNotFoundException e2) {
 				mHandler.sendEmptyMessage(MSG_ERROR_DIR);
-				return;
+				return false;
 			}
 			
 			try {
@@ -169,8 +174,9 @@ public class BackupGenerator implements Runnable
 				opt.close();
 			} catch (IOException e3) {
 				mHandler.sendEmptyMessage(MSG_ERROR_DIR);
-				return;
+				return false;
 			}
 		}
+		return true;
 	}
 }

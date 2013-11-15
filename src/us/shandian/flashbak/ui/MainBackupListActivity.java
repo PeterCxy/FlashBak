@@ -71,7 +71,6 @@ public class MainBackupListActivity extends Activity
 		mPane.setPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
 			@Override
 			public void onPanelOpened(View view) {
-				mLayout.setPadding(0, 0, 0, 0);
 				NewBackupFragment frag = (NewBackupFragment) mFragments.findFragmentById(R.id.container);
 				if (frag != null) {
 					frag.pause();
@@ -81,7 +80,6 @@ public class MainBackupListActivity extends Activity
 			
 			@Override
 			public void onPanelClosed(View view) {
-				mLayout.setPadding(0, 0, 0, 0);
 				NewBackupFragment frag = (NewBackupFragment) mFragments.findFragmentById(R.id.container);
 				if (frag != null) {
 					frag.resume();
@@ -91,7 +89,7 @@ public class MainBackupListActivity extends Activity
 			
 			@Override
 			public void onPanelSlide(View v, float f) {
-				mLayout.setPadding((int) -((1 - f) * 72), 0, (int) ((1 - f) * 72), 0);
+				mLayout.setLeft((int) -((1 - f) * 108));
 			}
 		});
 		mPane.openPane();

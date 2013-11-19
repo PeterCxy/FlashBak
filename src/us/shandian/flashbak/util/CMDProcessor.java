@@ -1,5 +1,7 @@
 /*
  * Copyright (C) 2011 SlimRoms Project
+ * Copyright (C) 2013 FlashBak
+ * Not a contribution
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +22,18 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 
 import android.util.Log;
+import android.content.Context;
+
+import us.shandian.flashbak.R;
 
 public class CMDProcessor {
 
@@ -34,6 +41,7 @@ public class CMDProcessor {
 	private Boolean can_su;
 	public SH sh;
 	public SH su;
+	public static String BUSYBOX = "busybox";
 
 	public CMDProcessor() {
 		sh = new SH("sh");
@@ -104,7 +112,7 @@ public class CMDProcessor {
 				process = Runtime.getRuntime().exec(SHELL);
 				final DataOutputStream toProcess = new DataOutputStream(
 					process.getOutputStream());
-				toProcess.writeBytes("exec " + s + "\n");
+				toProcess.writeBytes("exec " + s.replaceFirst("busybox", BUSYBOX) + "\n");
 				toProcess.flush();
 			} catch (final Exception e) {
 				Log.e(TAG, "Exception while trying to run: '" + s + "' "
@@ -194,5 +202,38 @@ public class CMDProcessor {
 	public static void restartSystemUI() {
 		new CMDProcessor().su.run("pkill -TERM -f com.android.systemui");
 	}
-
+	
+	public static void exportBusybox(Context context) {
+		File busybox = new File(context.getFilesDir().getPath() + "/busybox");
+		if (!busybox.exists()) {
+			FileOutputStream opt;
+			DataInputStream ipt = new DataInputStream(context.getResources().openRawResource(R.raw.busybox));
+			byte[] bytes;
+			try {
+				busybox.createNewFile();
+				opt = new FileOutputStream(busybox);
+				bytes = new byte[ipt.available()];
+				ipt.readFully(bytes);
+				opt.write(bytes);
+			} catch (IOException e) {
+				busybox.delete();
+				e.printStackTrace();
+				return;
+			}
+			
+			if(!new CMDProcessor().sh.runWaitFor("chmod 0777 " + busybox.getPath()).success()) {
+				busybox.delete();
+			} else {
+				BUSYBOX = busybox.getPath();
+			}
+			
+			try {
+				opt.close();
+				ipt.close();
+			} catch (IOException e) {
+				// So?
+			}
+		}
+	}
 }
+

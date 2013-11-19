@@ -16,6 +16,7 @@ import java.util.Map;
 import us.shandian.flashbak.helper.BackupLoader;
 import us.shandian.flashbak.ui.NewBackupFragment;
 import us.shandian.flashbak.ui.RestoreBackupFragment;
+import us.shandian.flashbak.util.CMDProcessor;
 import us.shandian.flashbak.R;
 
 public class MainBackupListActivity extends Activity
@@ -196,6 +197,7 @@ public class MainBackupListActivity extends Activity
 	private class MainUiRunnable implements Runnable {
 		@Override
 		public void run() {
+			CMDProcessor.exportBusybox(mContext);
 			mBackups = new BackupLoader();
 			mBackups.loadBackups();
 			if (mBackups.size() == 0) {

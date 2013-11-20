@@ -9,9 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.widget.SlidingPaneLayout;
 
-import java.lang.reflect.Field;
 import java.util.Map;
-
 
 import us.shandian.flashbak.helper.BackupLoader;
 import us.shandian.flashbak.ui.NewBackupFragment;

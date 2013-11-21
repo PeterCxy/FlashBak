@@ -106,6 +106,11 @@ public class BackupLoader implements Parcelable
 	
 	public void delete(String name) {
 		deleteDir(Environment.getExternalStorageDirectory() + "/FlashBak/" + Base64.encodeToString(name.getBytes(), Base64.NO_WRAP) + "/");
+		mBackupList.remove(get(name));
+	}
+	
+	public void deleteById(int id) {
+		delete(mBackupList.get(id).get("name").toString());
 	}
 	
 	private void deleteDir(String dirName) {

@@ -14,6 +14,8 @@ import java.util.Map;
 import us.shandian.flashbak.helper.BackupLoader;
 import us.shandian.flashbak.ui.NewBackupFragment;
 import us.shandian.flashbak.ui.RestoreBackupFragment;
+import us.shandian.flashbak.ui.widget.FlingerListView;
+import us.shandian.flashbak.ui.widget.FlingerListView.*;
 import us.shandian.flashbak.util.CMDProcessor;
 import us.shandian.flashbak.R;
 
@@ -29,7 +31,7 @@ public class MainBackupListActivity extends Activity
 	
 	private boolean mThreadRunning = false;
 
-	private ListView mBackupList;
+	private FlingerListView mBackupList;
 	private ProgressBar mWait;
 	private TextView mNoBackups;
 	private SlidingPaneLayout mPane;
@@ -60,11 +62,30 @@ public class MainBackupListActivity extends Activity
 		setTitle(FlashBakTitle);
 
 		mFragments = getFragmentManager();
-		mBackupList = (ListView) findViewById(R.id.backup_list);
+		mBackupList = (FlingerListView) findViewById(R.id.backup_list);
 		mWait = (ProgressBar) findViewById(R.id.wait_for_list_load);
 		mNoBackups = (TextView) findViewById(R.id.no_backups);
 		mLayout = (LinearLayout) findViewById(R.id.main_layout);
 		mPane = (SlidingPaneLayout) findViewById(R.id.mainPane);
+		
+		mBackupList.setOnItemFlingerListener(new OnItemFlingerListener() {
+			@Override
+			public boolean onItemFlingerStart(AdapterView<?> parent, View view, int position, long id) {
+				return true;
+			}
+			
+			@Override
+			public void onItemFlingerEnd(OnItemFlingerResponder responder, AdapterView<?> parent, View view, int position, long id) {
+				mBackups.deleteById(position);
+				if (mBackups.getAll().size() == 0) {
+					mNoBackups.setVisibility(View.VISIBLE);
+					mWait.setVisibility(View.GONE);
+					mBackupList.setVisibility(View.GONE);
+				}
+				mAdapter.notifyDataSetChanged();
+				responder.accept();
+			}
+		});
 		
 		mPane.setShadowResource(R.drawable.panel_shadow);
 		mPane.setPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {

@@ -88,7 +88,7 @@ public class MainBackupListActivity extends Activity
 			
 			@Override
 			public void onPanelSlide(View v, float f) {
-				mLayout.setLeft((int) -((1 - f) * 108));
+				mLayout.setTranslationX(- (1 - f) * 108);
 			}
 		});
 		mPane.openPane();

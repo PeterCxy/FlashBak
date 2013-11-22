@@ -326,11 +326,11 @@ public class FlingerListView extends ListView {
 							@Override
 							@SuppressWarnings("synthetic-access")
 							public void run() {
-								if (FlingerListView.this.mFlingingViewPressed) {
-									FlingerListView.this.mFlingingView.setPressed(true);
-									return;
-								}
 								if (FlingerListView.this.mFlingingView != null) {
+									if (FlingerListView.this.mFlingingViewPressed) {
+										FlingerListView.this.mFlingingView.setPressed(true);
+										return;
+									}
 									FlingerListView.this.mFlingingView.setPressed(false);
 								}
 							}
@@ -453,7 +453,7 @@ public class FlingerListView extends ListView {
 										FlingerListView.this.mFlingingView.setPressed(false);
 									}
 								}, PRESSED_DELAY_TIME);
-							performItemClick(
+							if (this.mFlingingViewPos != -1) performItemClick(
                                 this.mFlingingView,
                                 this.mFlingingViewPos,
                                 this.mFlingingView.getId());

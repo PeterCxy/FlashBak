@@ -23,6 +23,7 @@ import android.content.res.*;
 import android.graphics.*;
 import android.util.*;
 import android.view.*;
+import android.view.animation.*;
 import android.widget.*;
 
 /**
@@ -148,6 +149,7 @@ public class FlingerListView extends ListView {
     private boolean mMoveStarted;
     private boolean mLongPress;
     private Runnable mLongPressDetection;
+	private Animation mAnimation;
 
     private float mFlingRemovePercentaje;
     private float mFlingThreshold;
@@ -258,6 +260,11 @@ public class FlingerListView extends ListView {
         // This events are trap inside this method
         setLongClickable(false);
         setClickable(false);
+		
+		// If animating, refuse any event
+		if (this.mAnimation != null) {
+			return false;
+		}
 
         // Get information about the x and y
         int x = (int) ev.getX();
@@ -434,7 +441,20 @@ public class FlingerListView extends ListView {
 					this.mCurrentX = 0;
 					this.mTranslationX = 0;
 					if (this.mFlingingView != null) {
-						this.mFlingingView.setTranslationX(0);
+						// Start the animation
+						this.mAnimation = new TranslateAnimation(0, -this.mFlingingView.getTranslationX(), 0, 0);
+						this.mAnimation.setDuration(200);
+						this.mFlingingView.clearAnimation();
+						this.mFlingingView.setAnimation(this.mAnimation);
+						this.mFlingingView.postDelayed(new Runnable() {
+							@Override
+							public void run() {
+								FlingerListView.this.mAnimation = null;
+								FlingerListView.this.mFlingingView.clearAnimation();
+								FlingerListView.this.mFlingingView.setTranslationX(0);
+							}
+						}, 200);
+						this.mAnimation.startNow();
 					}
 				}
 

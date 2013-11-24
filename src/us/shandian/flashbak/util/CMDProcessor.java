@@ -221,7 +221,7 @@ public class CMDProcessor {
 				return;
 			}
 			
-			if(!new CMDProcessor().sh.runWaitFor("chmod 0777 " + busybox.getPath()).success()) {
+			if(!new CMDProcessor().su.runWaitFor("chmod 0777 " + busybox.getPath()).success()) {
 				busybox.delete();
 			} else {
 				BUSYBOX = busybox.getPath();

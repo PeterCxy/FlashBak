@@ -21,8 +21,7 @@
 		<us.shandian.flashbak.ui.widget.FlingerListView
 			android:id="@+id/backup_list"
 			android:layout_height="match_parent"
-			android:layout_width="match_parent"
-			android:layout_gravity="top" />
+			android:layout_width="match_parent" />
 		
 		<ProgressBar
 			android:id="@+id/wait_for_list_load"

@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.support.v4.widget.SlidingPaneLayout;
 
 import java.util.Map;
+import java.util.ArrayList;
 
 import us.shandian.flashbak.helper.BackupLoader;
 import us.shandian.flashbak.ui.NewBackupFragment;
@@ -37,8 +38,51 @@ public class MainBackupListActivity extends Activity
 	private SlidingPaneLayout mPane;
 	private LinearLayout mLayout;
 	private Menu mMenu;
+	private ArrayList<View> mSelectedViews = new ArrayList<View>();
 	
 	private SimpleAdapter mAdapter;
+	
+	private ActionMode mActionMode;
+	private ActionMode.Callback mCallback = new ActionMode.Callback() {
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			MenuInflater inflater = mode.getMenuInflater();
+			inflater.inflate(R.menu.context, menu);
+			return true;
+		}
+		
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			return false;
+		}
+		
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			switch (item.getItemId()) {
+				case R.id.context_delete: {
+					if (mSelectedViews.size() > 0) {
+						for (View v : mSelectedViews) {
+							mBackups.delete(((TextView)v.findViewById(R.id.backupitem_name)).getText().toString());
+						}
+					}
+					break;
+				}
+			}
+			mAdapter.notifyDataSetChanged();
+			mActionMode.finish();
+			mActionMode = null;
+			return true;
+		}
+		
+		@Override
+		public void onDestroyActionMode(ActionMode mode) {
+			mActionMode = null;
+			for (View v : mSelectedViews) {
+				v.findViewById(R.id.backupitem_num).getBackground().setAlpha(255);
+			}
+			mSelectedViews.clear();
+		}
+	};
 	
 	public String FlashBakTitle = "";
 	
@@ -71,7 +115,8 @@ public class MainBackupListActivity extends Activity
 		mBackupList.setOnItemFlingerListener(new OnItemFlingerListener() {
 			@Override
 			public boolean onItemFlingerStart(AdapterView<?> parent, View view, int position, long id) {
-				return true;
+				if (mActionMode == null) return true;
+				else return false;
 			}
 			
 			@Override
@@ -100,6 +145,10 @@ public class MainBackupListActivity extends Activity
 			
 			@Override
 			public void onPanelClosed(View view) {
+				if (mActionMode != null) {
+					mActionMode.finish();
+					mActionMode = null;
+				}
 				NewBackupFragment frag = (NewBackupFragment) mFragments.findFragmentById(R.id.container);
 				if (frag != null) {
 					frag.resume();
@@ -198,13 +247,43 @@ public class MainBackupListActivity extends Activity
 					mBackupList.setOnItemClickListener(new OnItemClickListener() {
 						@Override
 						public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-							Map<String, Object> map = (Map<String, Object>) mAdapter.getItem(arg2);
-							String name = (String) map.get("name");
-							Bundle bundle = new Bundle();
-							bundle.putString("name", name);
-							bundle.putParcelable("loader", mBackups);
-							mFragments.beginTransaction().replace(R.id.container, RestoreBackupFragment.newInstance(bundle)).commit();
-							mPane.closePane();
+							if (mActionMode == null) {
+								Map<String, Object> map = (Map<String, Object>) mAdapter.getItem(arg2);
+								String name = (String) map.get("name");
+								Bundle bundle = new Bundle();
+								bundle.putString("name", name);
+								bundle.putParcelable("loader", mBackups);
+								mFragments.beginTransaction().replace(R.id.container, RestoreBackupFragment.newInstance(bundle)).commit();
+								mPane.closePane();
+							} else {
+								for (View v : mSelectedViews) {
+									if (v == arg1) {
+										arg1.findViewById(R.id.backupitem_num).getBackground().setAlpha(255);
+										mSelectedViews.remove(arg1);
+										if (mSelectedViews.size() == 0) {
+											mActionMode.finish();
+											mActionMode = null;
+										}
+										return;
+									}
+								}
+								arg1.findViewById(R.id.backupitem_num).getBackground().setAlpha(125);
+								mSelectedViews.add(arg1);
+							}
+						}
+					});
+					mBackupList.setOnItemLongClickListener(new OnItemLongClickListener() {
+						@Override
+						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+							if (mActionMode != null) {
+								return false;
+							}
+							
+							mActionMode = MainBackupListActivity.this.startActionMode(mCallback);
+							arg1.setSelected(true);
+							arg1.findViewById(R.id.backupitem_num).getBackground().setAlpha(125);
+							mSelectedViews.add(arg1);
+							return true;
 						}
 					});
 					break;

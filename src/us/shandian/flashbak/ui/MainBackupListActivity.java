@@ -3,6 +3,7 @@ package us.shandian.flashbak.ui;
 import android.app.*;
 import android.os.*;
 import android.view.*;
+import android.view.animation.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
 import android.content.Context;
@@ -63,12 +64,22 @@ public class MainBackupListActivity extends Activity
 					if (mSelectedViews.size() > 0) {
 						for (View v : mSelectedViews) {
 							mBackups.delete(((TextView)v.findViewById(R.id.backupitem_name)).getText().toString());
+							ScaleAnimation anim = new ScaleAnimation(1.0f, 0.5f, 1.0f, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+							anim.setDuration(200);
+							v.clearAnimation();
+							v.setAnimation(anim);
+							anim.startNow();
 						}
 					}
+					mBackupList.postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							mAdapter.notifyDataSetChanged();
+						}
+					}, 150);
 					break;
 				}
 			}
-			mAdapter.notifyDataSetChanged();
 			mActionMode.finish();
 			mActionMode = null;
 			return true;
@@ -122,12 +133,22 @@ public class MainBackupListActivity extends Activity
 			@Override
 			public void onItemFlingerEnd(OnItemFlingerResponder responder, AdapterView<?> parent, View view, int position, long id) {
 				mBackups.deleteById(position);
-				if (mBackups.getAll().size() == 0) {
-					mNoBackups.setVisibility(View.VISIBLE);
-					mWait.setVisibility(View.GONE);
-					mBackupList.setVisibility(View.GONE);
-				}
-				mAdapter.notifyDataSetChanged();
+				view.clearAnimation();
+				ScaleAnimation anim = new ScaleAnimation(1.0f, 0.5f, 1.0f, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+				anim.setDuration(200);
+				view.setAnimation(anim);
+				anim.startNow();
+				mBackupList.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						mAdapter.notifyDataSetChanged();
+						if (mBackups.getAll().size() == 0) {
+							mNoBackups.setVisibility(View.VISIBLE);
+							mWait.setVisibility(View.GONE);
+							mBackupList.setVisibility(View.GONE);
+						}
+					}
+				}, 200);
 				responder.accept();
 			}
 		});

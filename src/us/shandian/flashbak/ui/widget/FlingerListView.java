@@ -307,7 +307,7 @@ public class FlingerListView extends ListView {
 									// Notify the long-click
 									FlingerListView.this.mLongPress = true;
 									performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-									FlingerListView.this.mFlingingView.setPressed(false);
+									FlingerListView.this.mFlingingView.setPressed(true);
 									OnItemLongClickListener listener = getOnItemLongClickListener();
 									if (listener != null) getOnItemLongClickListener().onItemLongClick(
                                         FlingerListView.this,
@@ -374,7 +374,6 @@ public class FlingerListView extends ListView {
 						if (ev.getX() - this.mCurrentX != 0) {
 							this.mCurrentX = (int)ev.getX();
 							this.mTranslationX = this.mCurrentX - this.mStartX;
-							this.mFlingingView.setTranslationX(this.mTranslationX);
 							this.mFlingingView.setPressed(false);
 
 							// Started
@@ -389,6 +388,7 @@ public class FlingerListView extends ListView {
 								}
 								this.mFlingingStarted = true;
 							}
+							this.mFlingingView.setTranslationX(this.mTranslationX);
 
 							
 						}
@@ -411,7 +411,7 @@ public class FlingerListView extends ListView {
 				// Detect if flinging occurs
 				float flingLimit =
 					(this.mFlingingViewWidth * this.mFlingRemovePercentaje);
-				if (!this.mFlinging && !this.mScrolling && Math.abs(this.mTranslationX) > flingLimit) {
+				if (this.mFlingingView != null && !this.mFlinging && !this.mScrolling && Math.abs(this.mTranslationX) > flingLimit) {
 					// Flinging occurs. Mark and raise an event
 					this.mFlinging = true;
 					final ItemFlingerResponder responder =

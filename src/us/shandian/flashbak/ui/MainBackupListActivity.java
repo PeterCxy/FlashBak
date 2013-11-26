@@ -8,6 +8,7 @@ import android.widget.*;
 import android.widget.AdapterView.*;
 import android.content.Context;
 import android.content.Intent;
+import android.util.SparseBooleanArray;
 import android.support.v4.widget.SlidingPaneLayout;
 
 import java.util.Map;
@@ -16,8 +17,6 @@ import java.util.ArrayList;
 import us.shandian.flashbak.helper.BackupLoader;
 import us.shandian.flashbak.ui.NewBackupFragment;
 import us.shandian.flashbak.ui.RestoreBackupFragment;
-import us.shandian.flashbak.ui.widget.FlingerListView;
-import us.shandian.flashbak.ui.widget.FlingerListView.*;
 import us.shandian.flashbak.util.CMDProcessor;
 import us.shandian.flashbak.R;
 
@@ -33,50 +32,41 @@ public class MainBackupListActivity extends Activity
 	
 	private boolean mThreadRunning = false;
 
-	private FlingerListView mBackupList;
+	private ListView mBackupList;
 	private ProgressBar mWait;
 	private TextView mNoBackups;
 	private SlidingPaneLayout mPane;
 	private LinearLayout mLayout;
 	private Menu mMenu;
-	private ArrayList<View> mSelectedViews = new ArrayList<View>();
 	
 	private SimpleAdapter mAdapter;
 	
-	private ActionMode mActionMode;
-	private ActionMode.Callback mCallback = new ActionMode.Callback() {
+	private ListView.MultiChoiceModeListener mCallback = new ListView.MultiChoiceModeListener() {
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			mActionMode = mode;
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.context, menu);
 			return true;
 		}
-		
+
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			return false;
 		}
-		
+
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			switch (item.getItemId()) {
 				case R.id.context_delete: {
-					if (mSelectedViews.size() > 0) {
-						for (View v : mSelectedViews) {
-							mBackups.delete(((TextView)v.findViewById(R.id.backupitem_name)).getText().toString());
-							ScaleAnimation anim = new ScaleAnimation(1.0f, 0.5f, 1.0f, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-							anim.setDuration(200);
-							v.clearAnimation();
-							v.setAnimation(anim);
-							anim.startNow();
+					SparseBooleanArray items = mBackupList.getCheckedItemPositions();
+					for (int i = 0; i < items.size(); i++) {
+						if (items.valueAt(i)) {
+							// Checked
+							mBackups.delete(((TextView) mBackupList.getChildAt(items.keyAt(i)).findViewById(R.id.backupitem_name)).getText().toString());
 						}
 					}
-					mBackupList.postDelayed(new Runnable() {
-						@Override
-						public void run() {
-							mAdapter.notifyDataSetChanged();
-						}
-					}, 150);
+					mAdapter.notifyDataSetChanged();
 					break;
 				}
 			}
@@ -84,16 +74,38 @@ public class MainBackupListActivity extends Activity
 			mActionMode = null;
 			return true;
 		}
-		
+
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
-			mActionMode = null;
-			for (View v : mSelectedViews) {
-				v.findViewById(R.id.backupitem_num).getBackground().setAlpha(255);
+			SparseBooleanArray items = mBackupList.getCheckedItemPositions();
+			for (int i = 0; i <= items.size(); i++) {
+				if (items.valueAt(i)) {
+					View item = mBackupList.getChildAt(items.keyAt(i));
+					View num = item.findViewById(R.id.backupitem_num);
+					item.setBackgroundColor(0);
+					num.getBackground().setAlpha(255);
+					items.put(items.keyAt(i), false);
+				}
 			}
-			mSelectedViews.clear();
+			mActionMode = null;
+		}
+		
+		@Override
+		public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked)
+		{
+			View item = mBackupList.getChildAt(position);
+			View num = item.findViewById(R.id.backupitem_num);
+			if (checked) {
+				item.setBackgroundResource(R.drawable.list_selected_holo_light);
+				num.getBackground().setAlpha(125);
+			} else {
+				item.setBackgroundColor(0);
+				num.getBackground().setAlpha(255);
+			}
 		}
 	};
+	
+	private ActionMode mActionMode;
 	
 	public String FlashBakTitle = "";
 	
@@ -117,41 +129,15 @@ public class MainBackupListActivity extends Activity
 		setTitle(FlashBakTitle);
 
 		mFragments = getFragmentManager();
-		mBackupList = (FlingerListView) findViewById(R.id.backup_list);
+		mBackupList = (ListView) findViewById(R.id.backup_list);
 		mWait = (ProgressBar) findViewById(R.id.wait_for_list_load);
 		mNoBackups = (TextView) findViewById(R.id.no_backups);
 		mLayout = (LinearLayout) findViewById(R.id.main_layout);
 		mPane = (SlidingPaneLayout) findViewById(R.id.mainPane);
 		
-		mBackupList.setOnItemFlingerListener(new OnItemFlingerListener() {
-			@Override
-			public boolean onItemFlingerStart(AdapterView<?> parent, View view, int position, long id) {
-				if (mActionMode == null) return true;
-				else return false;
-			}
-			
-			@Override
-			public void onItemFlingerEnd(OnItemFlingerResponder responder, AdapterView<?> parent, View view, int position, long id) {
-				mBackups.deleteById(position);
-				view.clearAnimation();
-				ScaleAnimation anim = new ScaleAnimation(1.0f, 0.5f, 1.0f, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-				anim.setDuration(200);
-				view.setAnimation(anim);
-				anim.startNow();
-				mBackupList.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						mAdapter.notifyDataSetChanged();
-						if (mBackups.getAll().size() == 0) {
-							mNoBackups.setVisibility(View.VISIBLE);
-							mWait.setVisibility(View.GONE);
-							mBackupList.setVisibility(View.GONE);
-						}
-					}
-				}, 200);
-				responder.accept();
-			}
-		});
+		mBackupList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+		mBackupList.setMultiChoiceModeListener(mCallback);
+					
 		
 		mPane.setShadowResource(R.drawable.panel_shadow);
 		mPane.setPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
@@ -276,24 +262,10 @@ public class MainBackupListActivity extends Activity
 								bundle.putParcelable("loader", mBackups);
 								mFragments.beginTransaction().replace(R.id.container, RestoreBackupFragment.newInstance(bundle)).commit();
 								mPane.closePane();
-							} else {
-								for (View v : mSelectedViews) {
-									if (v == arg1) {
-										arg1.findViewById(R.id.backupitem_num).getBackground().setAlpha(255);
-										mSelectedViews.remove(arg1);
-										if (mSelectedViews.size() == 0) {
-											mActionMode.finish();
-											mActionMode = null;
-										}
-										return;
-									}
-								}
-								arg1.findViewById(R.id.backupitem_num).getBackground().setAlpha(125);
-								mSelectedViews.add(arg1);
 							}
 						}
 					});
-					mBackupList.setOnItemLongClickListener(new OnItemLongClickListener() {
+					/* mBackupList.setOnItemLongClickListener(new OnItemLongClickListener() {
 						@Override
 						public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 							if (mActionMode != null) {
@@ -301,12 +273,14 @@ public class MainBackupListActivity extends Activity
 							}
 							
 							mActionMode = MainBackupListActivity.this.startActionMode(mCallback);
-							arg1.setSelected(true);
+							mBackupList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+							 mBackupList.setMultiChoiceModeListener(mCallback);
+							mBackupList.setItemChecked(arg2, true);
 							arg1.findViewById(R.id.backupitem_num).getBackground().setAlpha(125);
-							mSelectedViews.add(arg1);
+							
 							return true;
 						}
-					});
+					});*/
 					break;
 				}
 			}

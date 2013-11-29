@@ -15,8 +15,6 @@ import java.lang.Throwable;
 import java.lang.StackTraceElement;
 
 import us.shandian.flashbak.R;
-import android.widget.*;
-import android.renderscript.*;
 
 public class FlingerListView extends ListView
 {

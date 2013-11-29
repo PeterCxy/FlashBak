@@ -11,8 +11,6 @@ import android.database.*;
 import android.graphics.*;
 
 import java.util.HashMap;
-import java.lang.Throwable;
-import java.lang.StackTraceElement;
 
 import us.shandian.flashbak.R;
 
@@ -190,6 +188,7 @@ public class FlingerListView extends ListView
 		switch (ev.getAction() & MotionEvent.ACTION_MASK) {
 			case MotionEvent.ACTION_DOWN: {
 				mFlingingPos = -1;
+				mFlingingAllowed = false;
 				mColorState = false;
 				mStartTouchPositionX = x;
 				mStartTouchPositionY = y;
@@ -217,11 +216,13 @@ public class FlingerListView extends ListView
 					View child = mFlingingLayout.getChildAt(0);
 					if (Math.abs(y - mStartTouchPositionY) < mFlingingHeight && mListener != null) {
 						float movedX = x - mStartTouchPositionX;
-						float p = movedX / mFlingingWidth;
-						float translationX = movedX * (0.7f - Math.abs(p) / 20);
-						if (Math.abs(p) > 0.15f || child.getTranslationX() != 0) {
-							if (mListener.onItemFling(child, mFlingingPos, mFlingingLayout.getId(), mFlingingLayout)) {
-								mFlingingAllowed = true;
+						float p = Math.abs(movedX / mFlingingWidth);
+						float translationX = movedX * 0.7f;
+						if (p > 0.15f || child.getTranslationX() != 0) {
+							if (!mFlingingAllowed) {
+								mFlingingAllowed = mListener.onItemFling(child, mFlingingPos, mFlingingLayout.getId(), mFlingingLayout);
+							}
+							if (mFlingingAllowed) {
 								child.setTranslationX(translationX);
 								if (!mColorState) {
 									mFlingingLayout.setBackgroundColor(mColorBackground);
@@ -229,7 +230,6 @@ public class FlingerListView extends ListView
 									mColorState = true;
 								}
 							} else {
-								mFlingingAllowed = false;
 								child.setTranslationX(0);
 							}
 						}
@@ -311,6 +311,7 @@ public class FlingerListView extends ListView
 						}
 					}
 				// clear
+				mFlingingAllowed = false;
 				mStartTouchPositionX = 0;
 				mStartTouchPositionY = 0;
 				break;
@@ -324,46 +325,4 @@ public class FlingerListView extends ListView
 			mFlingingLayout.postDelayed(runnable, 500);
 		}
 	}
-	
-	private boolean isCallerAndroid() {
-		String className = "";
-		String myName = this.getClass().getName();
-		StackTraceElement[] elements = new Throwable().getStackTrace();
-		for (int i = 0; i < elements.length; i++) {
-			if (myName.equals(elements[i].getClassName()) && !myName.equals(elements[i + 1].getClassName())) {
-				className = elements[i + 1].getClassName();
-				break;
-			}
-		}
-		if (className.startsWith("android") || className.startsWith("com.android")) {
-			// This call is from the Android framewrok
-			return true;
-		} else {
-			// This call is not from the Android framework
-			return false;
-		}
-	}
-	
-	@Override
-	public View getChildAt(int index) {
-		View orig = super.getChildAt(index);
-		if (isCallerAndroid()) {
-			// Return original layout to Android framework
-			return orig;
-		}
-		
-		View child = null;
-		try {
-			child = ((ViewGroup) orig).getChildAt(0);
-		} catch (Exception e) {
-			child = null;
-		}
-		
-		if (child == null) {
-			return orig;
-		} else {
-			return child;
-		}
-	}
-		
 }

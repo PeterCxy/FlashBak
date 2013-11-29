@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import us.shandian.flashbak.helper.BackupLoader;
 import us.shandian.flashbak.ui.NewBackupFragment;
 import us.shandian.flashbak.ui.RestoreBackupFragment;
+import us.shandian.flashbak.ui.widget.FlingerListView;
+import us.shandian.flashbak.ui.widget.FlingerListView.OnItemFlingListener;
 import us.shandian.flashbak.util.CMDProcessor;
 import us.shandian.flashbak.R;
 
@@ -32,7 +34,7 @@ public class MainBackupListActivity extends Activity
 	
 	private boolean mThreadRunning = false;
 
-	private ListView mBackupList;
+	private FlingerListView mBackupList;
 	private ProgressBar mWait;
 	private TextView mNoBackups;
 	private SlidingPaneLayout mPane;
@@ -129,7 +131,7 @@ public class MainBackupListActivity extends Activity
 		setTitle(FlashBakTitle);
 
 		mFragments = getFragmentManager();
-		mBackupList = (ListView) findViewById(R.id.backup_list);
+		mBackupList = (FlingerListView) findViewById(R.id.backup_list);
 		mWait = (ProgressBar) findViewById(R.id.wait_for_list_load);
 		mNoBackups = (TextView) findViewById(R.id.no_backups);
 		mLayout = (LinearLayout) findViewById(R.id.main_layout);
@@ -137,7 +139,52 @@ public class MainBackupListActivity extends Activity
 		
 		mBackupList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 		mBackupList.setMultiChoiceModeListener(mCallback);
-					
+		mBackupList.setOnItemFlingListener(new OnItemFlingListener() {
+			@Override
+			public boolean onItemFling(View view, int position, long id, ViewGroup parent) {
+				if (mActionMode == null) {
+					mBackupList.setChoiceMode(ListView.CHOICE_MODE_NONE);
+					return true;
+				} else {
+					return false;
+				}
+			}
+			
+			@Override
+			public boolean onItemFlingEnd(View view, int position, long id, ViewGroup parent) {
+				if (mActionMode == null) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+			
+			@Override
+			public void onItemFlingCancel(View view, int position, long id, ViewGroup parent) {
+				if (mActionMode == null) {
+					mBackupList.runAfterAnimation(new Runnable() {
+						@Override
+						public void run() {
+							mBackupList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+						}
+					});
+				}
+			}
+			
+			@Override
+			public void onItemFlingOut(int position) {
+				if (mActionMode == null) {
+					mBackups.deleteById(position);
+					if (mBackups.size() == 0) {
+						mNoBackups.setVisibility(View.VISIBLE);
+						mWait.setVisibility(View.GONE);
+						mBackupList.setVisibility(View.GONE);
+					}
+					mBackupList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+					mAdapter.notifyDataSetChanged();
+				}
+			}
+		});
 		
 		mPane.setShadowResource(R.drawable.panel_shadow);
 		mPane.setPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
@@ -254,7 +301,7 @@ public class MainBackupListActivity extends Activity
 					mBackupList.setOnItemClickListener(new OnItemClickListener() {
 						@Override
 						public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-							if (mActionMode == null) {
+							if (mActionMode == null && mBackupList.getChoiceMode() != ListView.CHOICE_MODE_NONE) {
 								Map<String, Object> map = (Map<String, Object>) mAdapter.getItem(arg2);
 								String name = (String) map.get("name");
 								Bundle bundle = new Bundle();

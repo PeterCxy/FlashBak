@@ -19,10 +19,13 @@ import java.io.FileNotFoundException;
 
 import us.shandian.flashbak.util.CMDProcessor;
 import us.shandian.flashbak.helper.contact.ContactInfo;
+import static us.shandian.flashbak.BuildConfig.DEBUG;
 
 public class BackupGenerator implements Runnable
 {
 
+	private static final String TAG = "BackupGeneratpr";
+	
 	private ArrayList<ApplicationInfo> mAppList;
 	private String mBackupName;
 	private Handler mHandler;
@@ -51,6 +54,9 @@ public class BackupGenerator implements Runnable
 		String backupDir = Environment.getExternalStorageDirectory() + "/FlashBak/" + Base64.encodeToString(mBackupName.getBytes(), Base64.NO_WRAP) + "/";
 		File dir = new File(backupDir);
 		if (dir.exists()) {
+			if (DEBUG) {
+				Log.d(TAG, "Directory " + backupDir + " already exists");
+			}
 			mHandler.sendEmptyMessage(MSG_ERROR_DIR);
 			return;
 		}
@@ -66,12 +72,18 @@ public class BackupGenerator implements Runnable
 			}
 			new File(backupDir + info.packageName + "/").mkdir();
 			if (!cmd.su.runWaitFor("busybox cp " + info.sourceDir + " " + backupDir + info.packageName + "/package.apk").success()) {
+				if (DEBUG) {
+					Log.d(TAG, "Command line " + "busybox cp " + info.sourceDir + " " + backupDir + info.packageName + "/package.apk" + " exited with failure");
+				}
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 				return;
 			}
 			// Don't need to check for success because not all apps have odex file
 			cmd.su.runWaitFor("busybox cp " + info.sourceDir.substring(0, info.sourceDir.length() - 3) + "odex" + " " + backupDir + info.packageName + "/package.odex");
 			if (!cmd.su.runWaitFor("busybox tar czvf " + backupDir + info.packageName + "/data.tar.gz /data/data/" + info.packageName + " --exclude lib --exclude cache").success()) {
+				if (DEBUG) {
+					Log.d(TAG, "Command line " + "busybox tar czvf " + backupDir + info.packageName + "/data.tar.gz /data/data/" + info.packageName + " --exclude lib --exclude cache" + " exited with failure");
+				}
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 				return;
 			}
@@ -127,6 +139,9 @@ public class BackupGenerator implements Runnable
 	private boolean writeContacts(String dir, ArrayList<ContactInfo> list) {
 		File f = new File(dir + "Contacts/");
 		if (f.exists()) {
+			if (DEBUG) {
+				Log.d(TAG, "Directory " + dir + "Contacts/" + " already exists");
+			}
 			mHandler.sendEmptyMessage(MSG_ERROR_DIR);
 			return false;
 		} else {
@@ -137,6 +152,9 @@ public class BackupGenerator implements Runnable
 			String subPath = dir + "Contacts/" + Base64.encodeToString(info.getName().getBytes(), Base64.NO_WRAP) + "/";
 			File sub = new File(subPath);
 			if (sub.exists()) {
+				if (DEBUG) {
+					Log.d(TAG, "Directory " + subPath + " already exists");
+				}
 				mHandler.sendEmptyMessage(MSG_ERROR_DIR);
 				return false;
 			} else {
@@ -151,12 +169,18 @@ public class BackupGenerator implements Runnable
 			
 			File data = new File(subPath + "data");
 			if (data.exists()) {
+				if (DEBUG) {
+					Log.d(TAG, "File " + subPath + "data" + " already exists");
+				}
 				mHandler.sendEmptyMessage(MSG_ERROR_DIR);
 				return false;
 			} else {
 				try {
 					data.createNewFile();
 				} catch (IOException e1) {
+					if (DEBUG) {
+						Log.d(TAG, "Create file " + subPath + "data" + " failed");
+					}
 					mHandler.sendEmptyMessage(MSG_ERROR_DIR);
 					return false;
 				}
@@ -165,6 +189,9 @@ public class BackupGenerator implements Runnable
 			try {
 				opt = new FileOutputStream(data);
 			} catch (FileNotFoundException e2) {
+				if (DEBUG) {
+					Log.d(TAG, "Open file " + subPath + "data" + " failed");
+				}
 				mHandler.sendEmptyMessage(MSG_ERROR_DIR);
 				return false;
 			}
@@ -173,6 +200,9 @@ public class BackupGenerator implements Runnable
 				opt.write(str.toString().getBytes());
 				opt.close();
 			} catch (IOException e3) {
+				if (DEBUG) {
+					Log.d(TAG, "Write file " + subPath + "data" + " failed");
+				}
 				mHandler.sendEmptyMessage(MSG_ERROR_DIR);
 				return false;
 			}

@@ -3,6 +3,7 @@ package us.shandian.flashbak.helper;
 import android.content.pm.ApplicationInfo;
 import android.os.*;
 import android.util.Base64;
+import android.util.Log;
 import android.database.Cursor;
 import android.content.ContentProviderOperation;
 import android.content.OperationApplicationException;
@@ -23,9 +24,13 @@ import java.io.FileNotFoundException;
 
 import us.shandian.flashbak.util.CMDProcessor;
 import us.shandian.flashbak.helper.contact.ContactInfo;
+import static us.shandian.flashbak.BuildConfig.DEBUG;
 
 public class BackupRestorer implements Runnable
 {
+	
+	private static final String TAG = "BackupRestorer";
+	
 	private ArrayList<ApplicationInfo> mAppList;
 	private String mBackupName;
 	private Handler mHandler;
@@ -54,6 +59,9 @@ public class BackupRestorer implements Runnable
 		String backupDir = Environment.getExternalStorageDirectory() + "/FlashBak/" + Base64.encodeToString(mBackupName.getBytes(), Base64.NO_WRAP) + "/";
 		File dir = new File(backupDir);
 		if (!dir.exists()) {
+			if (DEBUG) {
+				Log.d(TAG, "Directory " + backupDir + " does not exist");
+			}
 			mHandler.sendEmptyMessage(MSG_ERROR_DIR);
 			return;
 		}
@@ -67,6 +75,9 @@ public class BackupRestorer implements Runnable
 				continue;
 			}
 			if (!cmd.su.runWaitFor("pm install -r " + backupDir + info.packageName + "/package.apk").success()) {
+				if (DEBUG) {
+					Log.d(TAG, "Install package " + backupDir + info.packageName + "/package.apk" + " failed");
+				}
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 				return;
 			}
@@ -88,18 +99,30 @@ public class BackupRestorer implements Runnable
 				}
 			}
 			if (!cmd.su.runWaitFor("busybox rm -rf /data/data/" + info.packageName).success()) {
+				if (DEBUG) {
+					Log.d(TAG, "Command line " + "busybox rm -rf /data/data/" + info.packageName + " exited with failure");
+				}
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 				return;
 			}
 			if (!cmd.su.runWaitFor("busybox tar zxvf " + backupDir + info.packageName + "/data.tar.gz -C /").success()) {
+				if (DEBUG) {
+					Log.d(TAG, "Command line " + "busybox tar zxvf " + backupDir + info.packageName + "/data.tar.gz -C /" + " exited with failure");
+				}
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 				return;
 			}
 			if (!cmd.su.runWaitFor("busybox chown -R " + appUid + ":" + appUid + " /data/data/" + info.packageName).success()) {
+				if (DEBUG) {
+					Log.d(TAG, "Command line " + "busybox chown -R " + appUid + ":" + appUid + " /data/data/" + info.packageName + " exited with failure");
+				}
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 				return;
 			}
 			if (!cmd.su.runWaitFor("busybox ln -s " + appLib + " /data/data/" + info.packageName + "/lib").success()) {
+				if (DEBUG) {
+					Log.d(TAG, "Command line " + "busybox ln -s " + appLib + " /data/data/" + info.packageName + "/lib" + " exited with failure");
+				}
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 				return;
 			}
@@ -117,14 +140,23 @@ public class BackupRestorer implements Runnable
 				}
 				
 				if (!cmd.su.runWaitFor("busybox cp " + backupDir + info.packageName + "/package.odex " + name).success()) {
+					if (DEBUG) {
+						Log.d(TAG, "Command line " + "busybox cp " + backupDir + info.packageName + "/package.odex " + name + " exited with failure");
+					}
 					mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 					return;
 				}
 				if (!cmd.su.runWaitFor("busybox chown system:" + appUid + " " + name).success()) {
+					if (DEBUG) {
+						Log.d(TAG, "Command line " + "busybox chown system:" + appUid + " " + name + " exited with failure");
+					}
 					mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 					return;
 				}
 				if (!cmd.su.runWaitFor("busybox chmod 0644 " + name).success()) {
+					if (DEBUG) {
+						Log.d(TAG, "Command line " + "busybox chmod 0644" + name + " exited with failure");
+					}
 					mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 					return;
 				}
@@ -212,6 +244,9 @@ public class BackupRestorer implements Runnable
 		ArrayList<ContactInfo> info = new ArrayList<ContactInfo>();
 		File contacts = new File(dir + "Contacts/");
 		if (!contacts.exists()) {
+			if (DEBUG) {
+				Log.d(TAG, "Directory " + dir + "Contacts/" + " does not exist");
+			}
 			mHandler.sendEmptyMessage(MSG_ERROR_DIR);
 			return null;
 		}
@@ -221,6 +256,9 @@ public class BackupRestorer implements Runnable
 				try {
 					ipt = new FileInputStream(f.getPath() + "/data");
 				} catch (FileNotFoundException e1) {
+					if (DEBUG) {
+						Log.d(TAG, "Open file " + f.getPath() + "/data" + " failed");
+					}
 					mHandler.sendEmptyMessage(MSG_ERROR_DIR);
 					return null;
 				}
@@ -230,6 +268,9 @@ public class BackupRestorer implements Runnable
 					ipt.read(buffer);
 					ipt.close();
 				} catch (IOException e2) {
+					if (DEBUG) {
+						Log.d(TAG, "Read file " + f.getPath() + "/data" + " failed");
+					}
 					mHandler.sendEmptyMessage(MSG_ERROR_DIR);
 					return null;
 				}

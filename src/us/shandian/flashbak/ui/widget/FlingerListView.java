@@ -226,6 +226,7 @@ public class FlingerListView extends ListView
 							}
 							if (mFlingingAllowed) {
 								mFlingingChild.setTranslationX(translationX);
+								mFlingingChild.setAlpha(1.0f - p);
 								if (!mColorState) {
 									mFlingingLayout.setBackgroundColor(mColorBackground);
 									mFlingingChild.setBackgroundColor(mColorForeground);
@@ -233,6 +234,7 @@ public class FlingerListView extends ListView
 								}
 							} else {
 								mFlingingChild.setTranslationX(0);
+								mFlingingChild.setAlpha(1.0f);
 							}
 						}
 					}
@@ -248,12 +250,16 @@ public class FlingerListView extends ListView
 							if (Math.abs(p) > 0.7f) {
 								if (mListener.onItemFlingEnd(mFlingingChild, mFlingingPos, mFlingingLayout.getId(), mFlingingLayout)) {
 									float translationX = mFlingingChild.getTranslationX();
-									TranslateAnimation anim;
+									TranslateAnimation anim1;
 									if (translationX > 0) {
-										anim = new TranslateAnimation(0, mFlingingWidth, 0, 0);
+										anim1 = new TranslateAnimation(0, mFlingingWidth, 0, 0);
 									} else {
-										anim = new TranslateAnimation(0, -mFlingingWidth, 0, 0);
+										anim1 = new TranslateAnimation(0, -mFlingingWidth, 0, 0);
 									}
+									AlphaAnimation anim2 = new AlphaAnimation(mFlingingChild.getAlpha(), 0f);
+									AnimationSet anim = new AnimationSet(true);
+									anim.addAnimation(anim1);
+									anim.addAnimation(anim2);
 									anim.setDuration(500);
 									mFlingingChild.clearAnimation();
 									mFlingingChild.setAnimation(anim);
@@ -261,6 +267,7 @@ public class FlingerListView extends ListView
 										@Override
 										public void run() {
 											mFlingingChild.clearAnimation();
+											mFlingingChild.setAlpha(1.0f);
 											mFlingingChild.setTranslationX(0);
 											mFlingingChild.setBackgroundColor(0);
 											mFlingingLayout.setBackgroundColor(0);
@@ -272,7 +279,11 @@ public class FlingerListView extends ListView
 									anim.startNow();
 								} else {
 									float translationX = mFlingingChild.getTranslationX();
-									TranslateAnimation anim = new TranslateAnimation(0, -translationX, 0, 0);
+									TranslateAnimation anim1 = new TranslateAnimation(0, -translationX, 0, 0);
+									AlphaAnimation anim2 = new AlphaAnimation(mFlingingChild.getAlpha(), 1.0f);
+									AnimationSet anim = new AnimationSet(true);
+									anim.addAnimation(anim1);
+									anim.addAnimation(anim2);
 									anim.setDuration(500);
 									mFlingingChild.clearAnimation();
 									mFlingingChild.setAnimation(anim);
@@ -280,6 +291,7 @@ public class FlingerListView extends ListView
 											@Override
 											public void run() {
 												mFlingingChild.clearAnimation();
+												mFlingingChild.setAlpha(1.0f);
 												mFlingingChild.setTranslationX(0);
 												mFlingingChild.setBackgroundColor(0);
 												mFlingingLayout.setBackgroundColor(0);
@@ -292,7 +304,11 @@ public class FlingerListView extends ListView
 							} else if (Math.abs(p) > 0.15f) {
 								mListener.onItemFlingCancel(mFlingingChild, mFlingingPos, mFlingingLayout.getId(), mFlingingLayout);
 								float translationX = mFlingingChild.getTranslationX();
-								TranslateAnimation anim = new TranslateAnimation(0, -translationX, 0, 0);
+								TranslateAnimation anim1 = new TranslateAnimation(0, -translationX, 0, 0);
+								AlphaAnimation anim2 = new AlphaAnimation(mFlingingChild.getAlpha(), 1.0f);
+								AnimationSet anim = new AnimationSet(true);
+								anim.addAnimation(anim1);
+								anim.addAnimation(anim2);
 								anim.setDuration(500);
 								mFlingingChild.clearAnimation();
 								mFlingingChild.setAnimation(anim);
@@ -300,6 +316,7 @@ public class FlingerListView extends ListView
 										@Override
 										public void run() {
 											mFlingingChild.clearAnimation();
+											mFlingingChild.setAlpha(1.0f);
 											mFlingingChild.setTranslationX(0);
 											mFlingingChild.setBackgroundColor(0);
 											mFlingingLayout.setBackgroundColor(0);
@@ -310,7 +327,12 @@ public class FlingerListView extends ListView
 								anim.startNow();
 							} else {
 								mListener.onItemFlingCancel(mFlingingChild, mFlingingPos, mFlingingLayout.getId(), mFlingingLayout);
+								mFlingingChild.setAlpha(1.0f);
 								mFlingingChild.setTranslationX(0);
+								mFlingingChild.setBackgroundColor(0);
+								mFlingingLayout.setBackgroundColor(0);
+								mFlingingLayout = null;
+								mFlingingChild = null;
 							}
 						}
 					}

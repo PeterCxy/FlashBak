@@ -130,6 +130,7 @@ public class FlingerListView extends ListView
 	private float mStartTouchPositionX;
 	private float mStartTouchPositionY;
 	private RelativeLayout mFlingingLayout;
+	private View mFlingingChild;
 	private int mFlingingPos;
 	private int mFlingingWidth;
 	private int mFlingingHeight;
@@ -179,7 +180,7 @@ public class FlingerListView extends ListView
 		float y = ev.getY();
 		
 		if (mFlingingLayout != null) {
-			if (mFlingingLayout.getChildAt(0).getAnimation() != null) {
+			if (mFlingingChild.getAnimation() != null) {
 				// Refuse any event when animate
 				return false;
 			}
@@ -194,14 +195,16 @@ public class FlingerListView extends ListView
 				mStartTouchPositionY = y;
 				mFlingingPos = pointToPosition((int) x, (int) y);
 				if (mFlingingLayout != null && mFlingingAllowed == true) {
-					mFlingingLayout.getChildAt(0).setTranslationX(0);
-					mFlingingLayout.getChildAt(0).setBackgroundColor(0);
+					mFlingingChild.setTranslationX(0);
+					mFlingingChild.setBackgroundColor(0);
 					mFlingingLayout.setBackgroundColor(0);
+					mFlingingChild = null;
 					mFlingingLayout = null;
 				}
 				mFlingingAllowed = false;
 				if (mFlingingPos != INVALID_POSITION) {
 					mFlingingLayout = (RelativeLayout) super.getChildAt(mFlingingPos);
+					mFlingingChild = mFlingingLayout.getChildAt(0);
 					Rect r = new Rect();
 					mFlingingLayout.getDrawingRect(r);
 					mFlingingWidth = r.width();
@@ -213,24 +216,23 @@ public class FlingerListView extends ListView
 			}
 			case MotionEvent.ACTION_MOVE: {
 				if (mFlingingLayout != null) {
-					View child = mFlingingLayout.getChildAt(0);
 					if (Math.abs(y - mStartTouchPositionY) < mFlingingHeight && mListener != null) {
 						float movedX = x - mStartTouchPositionX;
 						float p = Math.abs(movedX / mFlingingWidth);
 						float translationX = movedX * 0.7f;
-						if (p > 0.15f || child.getTranslationX() != 0) {
+						if (p > 0.15f || mFlingingChild.getTranslationX() != 0) {
 							if (!mFlingingAllowed) {
-								mFlingingAllowed = mListener.onItemFling(child, mFlingingPos, mFlingingLayout.getId(), mFlingingLayout);
+								mFlingingAllowed = mListener.onItemFling(mFlingingChild, mFlingingPos, mFlingingLayout.getId(), mFlingingLayout);
 							}
 							if (mFlingingAllowed) {
-								child.setTranslationX(translationX);
+								mFlingingChild.setTranslationX(translationX);
 								if (!mColorState) {
 									mFlingingLayout.setBackgroundColor(mColorBackground);
-									child.setBackgroundColor(mColorForeground);
+									mFlingingChild.setBackgroundColor(mColorForeground);
 									mColorState = true;
 								}
 							} else {
-								child.setTranslationX(0);
+								mFlingingChild.setTranslationX(0);
 							}
 						}
 					}
@@ -240,13 +242,12 @@ public class FlingerListView extends ListView
 			case MotionEvent.ACTION_CANCEL:
 			case MotionEvent.ACTION_UP: {
 					if (mFlingingLayout != null && mFlingingAllowed == true) {
-						View child = mFlingingLayout.getChildAt(0);
 						if (Math.abs(y - mStartTouchPositionY) < mFlingingHeight && mListener != null) {
 							float movedX = x - mStartTouchPositionX;
 							float p = movedX / mFlingingWidth;
 							if (Math.abs(p) > 0.7f) {
-								if (mListener.onItemFlingEnd(child, mFlingingPos, mFlingingLayout.getId(), mFlingingLayout)) {
-									float translationX = child.getTranslationX();
+								if (mListener.onItemFlingEnd(mFlingingChild, mFlingingPos, mFlingingLayout.getId(), mFlingingLayout)) {
+									float translationX = mFlingingChild.getTranslationX();
 									TranslateAnimation anim;
 									if (translationX > 0) {
 										anim = new TranslateAnimation(0, mFlingingWidth, 0, 0);
@@ -254,59 +255,62 @@ public class FlingerListView extends ListView
 										anim = new TranslateAnimation(0, -mFlingingWidth, 0, 0);
 									}
 									anim.setDuration(500);
-									child.clearAnimation();
-									child.setAnimation(anim);
-									child.postDelayed(new Runnable() {
+									mFlingingChild.clearAnimation();
+									mFlingingChild.setAnimation(anim);
+									mFlingingChild.postDelayed(new Runnable() {
 										@Override
 										public void run() {
-											mFlingingLayout.getChildAt(0).clearAnimation();
-											mFlingingLayout.getChildAt(0).setTranslationX(0);
-											mFlingingLayout.getChildAt(0).setBackgroundColor(0);
+											mFlingingChild.clearAnimation();
+											mFlingingChild.setTranslationX(0);
+											mFlingingChild.setBackgroundColor(0);
 											mFlingingLayout.setBackgroundColor(0);
 											mListener.onItemFlingOut(mFlingingPos);
 											mFlingingLayout = null;
+											mFlingingChild = null;
 										}
 									}, 500);
 									anim.startNow();
 								} else {
-									float translationX = child.getTranslationX();
+									float translationX = mFlingingChild.getTranslationX();
 									TranslateAnimation anim = new TranslateAnimation(0, -translationX, 0, 0);
 									anim.setDuration(500);
-									child.clearAnimation();
-									child.setAnimation(anim);
-									child.postDelayed(new Runnable() {
+									mFlingingChild.clearAnimation();
+									mFlingingChild.setAnimation(anim);
+									mFlingingChild.postDelayed(new Runnable() {
 											@Override
 											public void run() {
-												mFlingingLayout.getChildAt(0).clearAnimation();
-												mFlingingLayout.getChildAt(0).setTranslationX(0);
-												mFlingingLayout.getChildAt(0).setBackgroundColor(0);
+												mFlingingChild.clearAnimation();
+												mFlingingChild.setTranslationX(0);
+												mFlingingChild.setBackgroundColor(0);
 												mFlingingLayout.setBackgroundColor(0);
 												mFlingingLayout = null;
+												mFlingingChild = null;
 											}
 										}, 500);
 									anim.startNow();
 								}
 							} else if (Math.abs(p) > 0.15f) {
-								mListener.onItemFlingCancel(child, mFlingingPos, mFlingingLayout.getId(), mFlingingLayout);
-								float translationX = child.getTranslationX();
+								mListener.onItemFlingCancel(mFlingingChild, mFlingingPos, mFlingingLayout.getId(), mFlingingLayout);
+								float translationX = mFlingingChild.getTranslationX();
 								TranslateAnimation anim = new TranslateAnimation(0, -translationX, 0, 0);
 								anim.setDuration(500);
-								child.clearAnimation();
-								child.setAnimation(anim);
-								child.postDelayed(new Runnable() {
+								mFlingingChild.clearAnimation();
+								mFlingingChild.setAnimation(anim);
+								mFlingingChild.postDelayed(new Runnable() {
 										@Override
 										public void run() {
-											mFlingingLayout.getChildAt(0).clearAnimation();
-											mFlingingLayout.getChildAt(0).setTranslationX(0);
-											mFlingingLayout.getChildAt(0).setBackgroundColor(0);
+											mFlingingChild.clearAnimation();
+											mFlingingChild.setTranslationX(0);
+											mFlingingChild.setBackgroundColor(0);
 											mFlingingLayout.setBackgroundColor(0);
 											mFlingingLayout = null;
+											mFlingingChild = null;
 										}
 									}, 500);
 								anim.startNow();
 							} else {
-								mListener.onItemFlingCancel(child, mFlingingPos, mFlingingLayout.getId(), mFlingingLayout);
-								child.setTranslationX(0);
+								mListener.onItemFlingCancel(mFlingingChild, mFlingingPos, mFlingingLayout.getId(), mFlingingLayout);
+								mFlingingChild.setTranslationX(0);
 							}
 						}
 					}

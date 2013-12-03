@@ -200,7 +200,7 @@ public class NewBackupFragment extends Fragment
 				case BackupGenerator.MSG_ERROR_DIR: {
 					mProgress.dismiss();
 					AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-						dialog.setTitle(R.string.err_title);
+					dialog.setTitle(R.string.err_title);
 					dialog.setMessage(R.string.err_dir);
 					dialog.create().show();
 					break;
@@ -208,7 +208,7 @@ public class NewBackupFragment extends Fragment
 				case BackupGenerator.MSG_ERROR_SHELL: {
 					mProgress.dismiss();
 					AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-						dialog.setTitle(R.string.err_title);
+					dialog.setTitle(R.string.err_title);
 					dialog.setMessage(R.string.err_shell);
 					dialog.create().show();
 					break;

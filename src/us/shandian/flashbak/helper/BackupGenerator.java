@@ -149,6 +149,9 @@ public class BackupGenerator implements Runnable
 		}
 		
 		for (ContactInfo info : list) {
+			if (info == null || info.getName() == null) {
+				continue;
+			}
 			String subPath = dir + "Contacts/" + Base64.encodeToString(info.getName().getBytes(), Base64.NO_WRAP) + "/";
 			File sub = new File(subPath);
 			if (sub.exists()) {

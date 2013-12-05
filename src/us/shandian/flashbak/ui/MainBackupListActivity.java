@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import us.shandian.flashbak.helper.BackupLoader;
 import us.shandian.flashbak.ui.NewBackupFragment;
 import us.shandian.flashbak.ui.RestoreBackupFragment;
+import us.shandian.flashbak.ui.MergeBackupFragment;
 import us.shandian.flashbak.ui.widget.FlingerListView;
 import us.shandian.flashbak.ui.widget.FlingerListView.OnItemFlingListener;
 import us.shandian.flashbak.util.CMDProcessor;
@@ -69,6 +70,23 @@ public class MainBackupListActivity extends Activity
 						}
 					}
 					mAdapter.notifyDataSetChanged();
+					break;
+				}
+				case R.id.context_merge: {
+					SparseBooleanArray items = mBackupList.getCheckedItemPositions();
+					StringBuilder str = new StringBuilder();
+					for (int i = 0; i < items.size(); i++) {
+						if (items.valueAt(i)) {
+							// Checked
+							str.append(((TextView) ((ViewGroup) mBackupList.getChildAt(items.keyAt(i))).findViewById(R.id.backupitem_name)).getText().toString());
+							str.append("\n");
+						}
+					}
+					Bundle bundle = new Bundle();
+					bundle.putString("needs", str.toString());
+					bundle.putParcelable("loader", mBackups);
+					mFragments.beginTransaction().replace(R.id.container, MergeBackupFragment.newInstance(bundle)).commit();
+					mPane.closePane();
 					break;
 				}
 			}

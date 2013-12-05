@@ -13,5 +13,6 @@
 	<string name="err_title">Error</string>
 	<string name="title_restore_backup">Restore Backup</string>
 	<string name="item_backup_contacts">Contacts Info</string>
+	<string name="title_merge_backups">Merge Backups</string>
 
 </resources>

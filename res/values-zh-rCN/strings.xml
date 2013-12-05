@@ -13,5 +13,6 @@
 	<string name="err_title">错误</string>
 	<string name="title_restore_backup">恢复备份</string>
 	<string name="item_backup_contacts">联系人信息</string>
+	<string name="title_merge_backups">合并备份</string>
 
 </resources>

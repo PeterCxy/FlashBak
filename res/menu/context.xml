@@ -1,6 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     
     <item
+		android:id="@+id/context_merge"
+		android:icon="@drawable/ic_action_merge"/>
+	
+	<item
         android:id="@+id/context_delete"
         android:icon="@drawable/ic_action_discard"/>
     

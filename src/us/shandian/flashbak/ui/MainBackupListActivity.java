@@ -98,7 +98,7 @@ public class MainBackupListActivity extends Activity
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
 			SparseBooleanArray items = mBackupList.getCheckedItemPositions();
-			for (int i = 0; i <= items.size(); i++) {
+			for (int i = 0; i < items.size(); i++) {
 				if (items.valueAt(i)) {
 					View item = mBackupList.getChildAt(items.keyAt(i));
 					View num = item.findViewById(R.id.backupitem_num);

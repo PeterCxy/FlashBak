@@ -12,8 +12,7 @@
 		android:gravity="center"
 		android:layout_alignParentLeft="true"
 		android:textColor="#F2F2F2"
-		android:id="@+id/backupitem_num"
-		android:layout_marginBottom="5dp"/>
+		android:id="@+id/backupitem_num"/>
 
 	<TextView
 		android:layout_height="48dp"
@@ -23,8 +22,7 @@
 		android:layout_toRightOf="@id/backupitem_num"
 		android:id="@+id/backupitem_name"
 		android:gravity="center_vertical"
-		android:layout_marginLeft="5dp"
-		android:layout_marginBottom="5dp"/>
+		android:layout_marginLeft="5dp"/>
 
 	<TextView
 		android:layout_height="48dp"
@@ -34,7 +32,6 @@
 		android:gravity="center_vertical"
 		android:id="@+id/backupitem_date"
 		android:textColor="#808080"
-		android:layout_marginBottom="5dp"
 		android:layout_marginRight="5dp"/>
 
 </RelativeLayout>

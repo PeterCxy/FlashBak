@@ -2,11 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="us.shandian.flashbak"
     android:versionCode="2"
-    android:versionName="0.2c" >
+    android:versionName="0.2d" >
 
     <uses-sdk 
         android:minSdkVersion="14" 
-        android:targetSdkVersion="18" />
+        android:targetSdkVersion="19" />
 
 	<uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

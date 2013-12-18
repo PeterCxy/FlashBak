@@ -83,15 +83,30 @@ public class BackupRestorer implements Runnable
 			}
 			String appUid = "";
 			String appLib = "";
-			String[] ls = cmd.su.runWaitFor("busybox ls -l /data/data").stdout.split(" ");
+			String[] ls = null;
+			do {
+				String r = cmd.su.runWaitFor("busybox ls -l /data/data").stdout;
+				if (r == null) continue;
+				ls = r.split(" ");
+				if (ls.length < 3) {
+					ls = null;
+				}
+			} while (ls == null);
+			
 			for (String str : ls) {
-				if (str.startsWith("app_")) {
+				if (str.matches("u(.*?)_a(.*?)")) {
 					appUid = str;
 				} else if (str.startsWith(info.packageName.substring(0, info.packageName.length() - 1))) {
 					break;
 				}
 			}
-			ls = cmd.su.runWaitFor("busybox ls -l /data/data/" + info.packageName + "/lib").stdout.split(" ");
+			String r = cmd.su.runWaitFor("busybox ls -l /data/data/" + info.packageName + "/lib").stdout;
+			if (r != null) {
+				ls = r.split(" ");
+			} else {
+				ls = new String[0];
+				appLib = null;
+			}
 			for (String str : ls) {
 				if (str.startsWith("/data/app-lib")) {
 					appLib = str;
@@ -119,7 +134,7 @@ public class BackupRestorer implements Runnable
 				mHandler.sendEmptyMessage(MSG_ERROR_SHELL);
 				return;
 			}
-			if (!cmd.su.runWaitFor("busybox ln -s " + appLib + " /data/data/" + info.packageName + "/lib").success()) {
+			if (appLib != null && !cmd.su.runWaitFor("busybox ln -s " + appLib + " /data/data/" + info.packageName + "/lib").success()) {
 				if (DEBUG) {
 					Log.d(TAG, "Command line " + "busybox ln -s " + appLib + " /data/data/" + info.packageName + "/lib" + " exited with failure");
 				}

@@ -6,6 +6,7 @@ import android.view.*;
 import android.view.animation.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
+import android.graphics.drawable.ColorDrawable;
 import android.content.Context;
 import android.content.Intent;
 import android.util.SparseBooleanArray;
@@ -116,7 +117,7 @@ public class MainBackupListActivity extends Activity
 			View item = mBackupList.getChildAt(position);
 			View num = item.findViewById(R.id.backupitem_num);
 			if (checked) {
-				item.setBackgroundResource(R.drawable.list_selected_holo_light);
+				item.setBackgroundResource(android.R.color.holo_orange_light);
 				num.getBackground().setAlpha(125);
 			} else {
 				item.setBackgroundColor(0);
@@ -138,6 +139,7 @@ public class MainBackupListActivity extends Activity
 	{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_backuplist);
+		getActionBar().setIcon(new ColorDrawable(0));
 		mContext = (Context) this;
 		String version = "";
 		try {

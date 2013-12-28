@@ -6,7 +6,7 @@
 	android:orientation="vertical"
 	android:focusable="true"
 	android:focusableInTouchMode="true"
-	android:background="#E0E0DF">
+	android:background="@android:color/holo_orange_light">
 
 	<EditText
 		android:layout_height="match_parent"

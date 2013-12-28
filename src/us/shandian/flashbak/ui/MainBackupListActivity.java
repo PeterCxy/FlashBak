@@ -6,7 +6,6 @@ import android.view.*;
 import android.view.animation.*;
 import android.widget.*;
 import android.widget.AdapterView.*;
-import android.graphics.drawable.ColorDrawable;
 import android.content.Context;
 import android.content.Intent;
 import android.util.SparseBooleanArray;
@@ -139,7 +138,6 @@ public class MainBackupListActivity extends Activity
 	{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_backuplist);
-		getActionBar().setIcon(new ColorDrawable(0));
 		mContext = (Context) this;
 		String version = "";
 		try {

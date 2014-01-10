@@ -12,6 +12,7 @@ import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.CommonDataKinds.*;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,7 +25,7 @@ import static us.shandian.flashbak.BuildConfig.DEBUG;
 public class BackupGenerator implements Runnable
 {
 
-	private static final String TAG = "BackupGeneratpr";
+	private static final String TAG = "BackupGenerator";
 	
 	private ArrayList<ApplicationInfo> mAppList;
 	private String mBackupName;
@@ -155,14 +156,13 @@ public class BackupGenerator implements Runnable
 			String subPath = dir + "Contacts/" + Base64.encodeToString(info.getName().getBytes(), Base64.NO_WRAP) + "/";
 			File sub = new File(subPath);
 			if (sub.exists()) {
-				if (DEBUG) {
-					Log.d(TAG, "Directory " + subPath + " already exists");
-				}
-				mHandler.sendEmptyMessage(MSG_ERROR_DIR);
-				return false;
-			} else {
-				sub.mkdir();
+				do {
+					subPath = dir + "Contacts/" + Base64.encodeToString((info.getName() + new Random().nextInt()).getBytes(), Base64.NO_WRAP) + "/";
+					sub = new File(subPath);
+				} while (sub.exists());
 			}
+			
+			sub.mkdir();
 			
 			StringBuilder str = new StringBuilder();
 			str.append(info.getName()).append("\n");

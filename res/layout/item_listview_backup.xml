@@ -12,7 +12,9 @@
 		android:background="#96908F"
 		android:gravity="center"
 		android:layout_alignParentLeft="true"
-		android:textColor="#F2F2F2"
+		android:textColor="#FFFFFF"
+		android:textStyle="bold"
+		android:textSize="25sp"
 		android:id="@+id/backupitem_num"/>
 
 	<TextView

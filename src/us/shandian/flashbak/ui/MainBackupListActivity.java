@@ -35,7 +35,8 @@ public class MainBackupListActivity extends Activity
 		android.R.color.holo_purple,
 		android.R.color.holo_blue_dark,
 		android.R.color.holo_orange_light,
-		android.R.color.holo_red_dark
+		android.R.color.holo_red_dark, 
+		android.R.color.holo_blue_light
 	};
 	
     private BackupLoader mBackups;

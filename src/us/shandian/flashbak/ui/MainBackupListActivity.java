@@ -26,6 +26,18 @@ import us.shandian.flashbak.R;
 public class MainBackupListActivity extends Activity
 {
 
+	private static final int[] NUM_COLORS = new int[] {
+		android.R.color.holo_blue_bright,
+		android.R.color.holo_green_light,
+		android.R.color.holo_orange_dark,
+		android.R.color.holo_red_light,
+		android.R.color.holo_green_dark,
+		android.R.color.holo_purple,
+		android.R.color.holo_blue_dark,
+		android.R.color.holo_orange_light,
+		android.R.color.holo_red_dark
+	};
+	
     private BackupLoader mBackups;
 
 	private Context mContext;
@@ -314,7 +326,20 @@ public class MainBackupListActivity extends Activity
 					mBackupList.setVisibility(View.VISIBLE);
 					mAdapter = new SimpleAdapter(mContext, mBackups.getAll(), R.layout.item_listview_backup, 
 						                   new String[] {"name", "date", "num"}, 
-										   new int[] {R.id.backupitem_name, R.id.backupitem_date, R.id.backupitem_num});
+										   new int[] {R.id.backupitem_name, R.id.backupitem_date, R.id.backupitem_num}) {
+											   @Override
+											   public View getView(int position, View convertView, ViewGroup parent) {
+												   View view = super.getView(position, convertView, parent);
+												   if (view != convertView) {
+													   TextView num = (TextView) view.findViewById(R.id.backupitem_num);
+													   if (num != null) {
+														   int number = Integer.parseInt(num.getText().toString()) % 10;
+														   num.setBackgroundColor(mContext.getResources().getColor(NUM_COLORS[number]));
+													   }
+												   }
+												   return view;
+											   }
+										   };
 					mBackupList.setAdapter(mAdapter);
 					mBackupList.setOnItemClickListener(new OnItemClickListener() {
 						@Override

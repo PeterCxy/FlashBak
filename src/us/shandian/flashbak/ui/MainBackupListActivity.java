@@ -213,6 +213,7 @@ public class MainBackupListActivity extends Activity
 					}
 					mBackupList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 					mAdapter.notifyDataSetChanged();
+					mHandler.sendEmptyMessage(MSG_SHOW_LIST);
 				}
 			}
 		});

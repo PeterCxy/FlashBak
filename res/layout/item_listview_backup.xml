@@ -14,7 +14,7 @@
 		android:layout_alignParentLeft="true"
 		android:textColor="#FFFFFF"
 		android:textStyle="bold"
-		android:textSize="25sp"
+		android:textSize="15sp"
 		android:id="@+id/backupitem_num"/>
 
 	<TextView
